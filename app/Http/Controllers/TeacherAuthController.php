@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Teacher;
+use App\Models\VerificationCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 /**
  * TeacherAuthController
- * Handles teacher authentication: signup, login, logout
+ * Handles teacher authentication: signup, login, logout, password reset
  */
 class TeacherAuthController extends Controller
 {
@@ -127,5 +128,125 @@ class TeacherAuthController extends Controller
     public function dashboard()
     {
         return view('teacher.dashboard');
+    }
+
+    /**
+     * Show forgot password form
+     */
+    public function showForgotPasswordForm()
+    {
+        return view('teacher.forgot-password');
+    }
+
+    /**
+     * Send password reset code
+     */
+    public function sendResetCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:teachers,email',
+        ]);
+
+        $teacher = Teacher::where('email', $request->email)->first();
+
+        // Generate reset code
+        $code = VerificationCode::generateCode();
+        
+        VerificationCode::create([
+            'email' => $teacher->email,
+            'code' => $code,
+            'type' => 'reset',
+            'expires_at' => now()->addMinutes(15),
+        ]);
+
+        // Send email
+        EmailHelper::sendVerificationEmail($teacher->email, $code, $teacher->name, 'reset');
+
+        session(['reset_email' => $teacher->email]);
+
+        return redirect()->route('teacher.reset.verify')->with('success', 'Reset code sent to your email!')
+               ->with('verification_code', $code);
+    }
+
+    /**
+     * Show reset code verification form
+     */
+    public function showResetVerifyForm()
+    {
+        if (!session()->has('reset_email')) {
+            return redirect()->route('teacher.forgot-password');
+        }
+        return view('teacher.reset-verify');
+    }
+
+    /**
+     * Verify reset code and show new password form
+     */
+    public function verifyResetCode(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ]);
+
+        $email = session('reset_email');
+        
+        if (!$email) {
+            return redirect()->route('teacher.login')->with('error', 'Session expired.');
+        }
+
+        // Find valid verification code
+        $verification = VerificationCode::where('email', $email)
+            ->where('code', $request->code)
+            ->where('type', 'reset')
+            ->where('is_used', false)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$verification) {
+            return back()->with('error', 'Invalid or expired code.');
+        }
+
+        // Mark as used
+        $verification->update(['is_used' => true]);
+
+        session(['verified_reset_email' => $email]);
+        session()->forget('reset_email');
+
+        return redirect()->route('teacher.reset.password')->with('success', 'Code verified! Set your new password.');
+    }
+
+    /**
+     * Show new password form
+     */
+    public function showResetPasswordForm()
+    {
+        if (!session()->has('verified_reset_email')) {
+            return redirect()->route('teacher.forgot-password');
+        }
+        return view('teacher.reset-password');
+    }
+
+    /**
+     * Reset password
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $email = session('verified_reset_email');
+        
+        if (!$email) {
+            return redirect()->route('teacher.login')->with('error', 'Session expired.');
+        }
+
+        // Update password
+        $teacher = Teacher::where('email', $email)->first();
+        $teacher->update(['password' => $request->password]);
+
+        session()->forget('verified_reset_email');
+
+        return redirect()->route('teacher.login')->with('success', 'Password reset successfully! Please login.');
     }
 }

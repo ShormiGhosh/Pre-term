@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pre-term Attendance System</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -148,12 +149,13 @@
         .features li {
             padding: 0.5rem 0;
             opacity: 0.9;
+            display: flex;
+            align-items: center;
         }
 
-        .features li:before {
-            content: "✓ ";
-            font-weight: bold;
+        .features li .material-icons {
             margin-right: 0.5rem;
+            font-size: 20px;
         }
     </style>
 </head>
@@ -164,7 +166,7 @@
 
         <div class="cards-container">
             <div class="portal-card">
-                <h2>👨‍🏫 Teacher Portal</h2>
+                <h2><span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem; font-size: 2rem;">school</span>Teacher Portal</h2>
                 <p>Manage student records, track attendance, schedule CTs, and record marks.</p>
                 <div class="portal-buttons">
                     <a href="{{ route('teacher.login') }}" class="btn btn-primary">Login as Teacher</a>
@@ -173,7 +175,7 @@
             </div>
 
             <div class="portal-card">
-                <h2>👨‍🎓 Student Portal</h2>
+                <h2><span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem; font-size: 2rem;">person</span>Student Portal</h2>
                 <p>View your attendance, check CT schedules, track marks, and monitor eligibility for finals.</p>
                 <div class="portal-buttons">
                     <a href="{{ route('student.login') }}" class="btn btn-primary">Login as Student</a>
@@ -185,11 +187,11 @@
         <div class="features">
             <h3>System Features</h3>
             <ul>
-                <li>Attendance tracking with 60% eligibility alerts</li>
-                <li>CT schedule and marks management</li>
-                <li>Class performance records (20 marks)</li>
-                <li>Teacher-wise mark distribution</li>
-                <li>Real-time eligibility status for term finals</li>
+                <li><span class="material-icons">check_circle</span>Attendance tracking with 60% eligibility alerts</li>
+                <li><span class="material-icons">check_circle</span>CT schedule and marks management</li>
+                <li><span class="material-icons">check_circle</span>Class performance records (20 marks)</li>
+                <li><span class="material-icons">check_circle</span>Teacher-wise mark distribution</li>
+                <li><span class="material-icons">check_circle</span>Real-time eligibility status for term finals</li>
             </ul>
         </div>
     </div>

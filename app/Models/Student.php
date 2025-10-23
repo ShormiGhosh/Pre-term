@@ -32,6 +32,7 @@ class Student extends Authenticatable
         'department',
         'year',
         'semester',
+        'email_verified',
     ];
 
     /**

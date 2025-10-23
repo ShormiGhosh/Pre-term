@@ -3,6 +3,8 @@
 @section('title', 'Teacher Signup')
 
 @section('content')
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
 <div class="card">
     <h1 class="card-title">Teacher Signup</h1>
     
@@ -47,7 +49,12 @@
 
         <div class="form-group">
             <label for="password" class="form-label">Password</label>
-            <input type="password" id="password" name="password" class="form-input" required>
+            <div style="position: relative;">
+                <input type="password" id="password" name="password" class="form-input" style="padding-right: 45px;" required>
+                <button type="button" onclick="togglePassword('password', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; padding: 0; display: flex; align-items: center;">
+                    <span class="material-icons" style="font-size: 20px;">visibility_off</span>
+                </button>
+            </div>
             @error('password')
                 <span class="form-error">{{ $message }}</span>
             @enderror
@@ -55,7 +62,12 @@
 
         <div class="form-group">
             <label for="password_confirmation" class="form-label">Confirm Password</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" required>
+            <div style="position: relative;">
+                <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" style="padding-right: 45px;" required>
+                <button type="button" onclick="togglePassword('password_confirmation', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; padding: 0; display: flex; align-items: center;">
+                    <span class="material-icons" style="font-size: 20px;">visibility_off</span>
+                </button>
+            </div>
         </div>
 
         <button type="submit" class="btn btn-primary">Sign Up</button>
@@ -66,4 +78,19 @@
         <p><a href="{{ route('home') }}" class="link">Back to Home</a></p>
     </div>
 </div>
+
+<script>
+function togglePassword(fieldId, button) {
+    const field = document.getElementById(fieldId);
+    const icon = button.querySelector('.material-icons');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.textContent = 'visibility';
+    } else {
+        field.type = 'password';
+        icon.textContent = 'visibility_off';
+    }
+}
+</script>
 @endsection

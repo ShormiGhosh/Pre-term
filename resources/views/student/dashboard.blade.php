@@ -32,10 +32,19 @@
         </ul>
     </div>
 
-    <form action="{{ route('student.logout') }}" method="POST">
-        @csrf
-        <button type="submit" class="btn btn-danger">Logout</button>
-    </form>
+    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <a href="{{ route('student.profile') }}" 
+           style="flex: 1; padding: 0.875rem; background: #401a75; color: #F1F5FB; border: none; border-radius: 8px; font-size: 1rem; font-weight: 500; cursor: pointer; text-align: center; text-decoration: none; display: inline-block;">
+            View Profile
+        </a>
+        
+        <form action="{{ route('student.logout') }}" method="POST" style="flex: 1;">
+            @csrf
+            <button type="submit" class="btn btn-danger" style="width: 100%;">
+                Logout
+            </button>
+        </form>
+    </div>
 </div>
 @endsection
 

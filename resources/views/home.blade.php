@@ -80,13 +80,14 @@
 
         .logo {
             font-size: 6rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0;
             color: #401a75;
         }
 
         .home-title {
             font-size: 3rem;
             margin-bottom: 1rem;
+            margin-top: 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             color: #FFFFFF;
         }

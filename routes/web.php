@@ -52,6 +52,10 @@ Route::post('/teacher/reset-password', [TeacherAuthController::class, 'resetPass
 // Protected routes (teacher auth required)
 Route::middleware(['teacher.auth'])->group(function () {
     Route::get('/teacher/dashboard', [TeacherAuthController::class, 'dashboard'])->name('teacher.dashboard');
+    Route::get('/teacher/profile', [TeacherAuthController::class, 'showProfile'])->name('teacher.profile');
+    Route::get('/teacher/profile/edit', [TeacherAuthController::class, 'showEditProfile'])->name('teacher.profile.edit');
+    Route::post('/teacher/profile/update', [TeacherAuthController::class, 'updateProfile'])->name('teacher.profile.update');
+    Route::post('/teacher/profile/delete', [TeacherAuthController::class, 'deleteAccount'])->name('teacher.profile.delete');
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });
 
@@ -81,5 +85,9 @@ Route::post('/student/reset-password', [StudentAuthController::class, 'resetPass
 // Protected routes (student auth required)
 Route::middleware(['student.auth'])->group(function () {
     Route::get('/student/dashboard', [StudentAuthController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/student/profile', [StudentAuthController::class, 'showProfile'])->name('student.profile');
+    Route::get('/student/profile/edit', [StudentAuthController::class, 'showEditProfile'])->name('student.profile.edit');
+    Route::post('/student/profile/update', [StudentAuthController::class, 'updateProfile'])->name('student.profile.update');
+    Route::post('/student/profile/delete', [StudentAuthController::class, 'deleteAccount'])->name('student.profile.delete');
     Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 });

@@ -30,6 +30,7 @@ class Teacher extends Authenticatable
         'password',
         'department',
         'designation',
+        'profile_image',
     ];
 
     /**

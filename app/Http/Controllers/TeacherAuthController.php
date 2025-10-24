@@ -249,4 +249,79 @@ class TeacherAuthController extends Controller
 
         return redirect()->route('teacher.login')->with('success', 'Password reset successfully! Please login.');
     }
+
+    /**
+     * Show teacher profile page
+     */
+    public function showProfile()
+    {
+        $teacher = Teacher::find(session('user_id'));
+        return view('teacher.profile', compact('teacher'));
+    }
+
+    /**
+     * Show edit profile form
+     */
+    public function showEditProfile()
+    {
+        $teacher = Teacher::find(session('user_id'));
+        return view('teacher.edit-profile', compact('teacher'));
+    }
+
+    /**
+     * Update teacher profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $teacher = Teacher::find(session('user_id'));
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'department' => 'required|string|max:100',
+            'designation' => 'required|string|max:100',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Handle profile image upload
+        if ($request->hasFile('profile_image')) {
+            // Delete old image if exists
+            if ($teacher->profile_image && file_exists(public_path('uploads/profiles/' . $teacher->profile_image))) {
+                unlink(public_path('uploads/profiles/' . $teacher->profile_image));
+            }
+
+            $image = $request->file('profile_image');
+            $imageName = time() . '_' . $teacher->id . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/profiles'), $imageName);
+            $teacher->profile_image = $imageName;
+        }
+
+        $teacher->update([
+            'name' => $request->name,
+            'department' => $request->department,
+            'designation' => $request->designation,
+        ]);
+
+        // Update session data
+        session(['user_name' => $teacher->name]);
+
+        return redirect()->route('teacher.profile')->with('success', 'Profile updated successfully!');
+    }
+
+    /**
+     * Delete teacher account
+     */
+    public function deleteAccount()
+    {
+        $teacher = Teacher::find(session('user_id'));
+
+        // Delete profile image if exists
+        if ($teacher->profile_image && file_exists(public_path('uploads/profiles/' . $teacher->profile_image))) {
+            unlink(public_path('uploads/profiles/' . $teacher->profile_image));
+        }
+
+        $teacher->delete();
+        session()->flush();
+
+        return redirect()->route('home')->with('success', 'Your account has been deleted successfully.');
+    }
 }

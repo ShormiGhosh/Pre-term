@@ -21,49 +21,89 @@
         }
 
         .navbar {
-            background-color: #302e4a;
+            background: rgba(28, 26, 54, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(64, 26, 117, 0.3);
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .navbar-content {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #FFFFFF;
-            text-decoration: none;
+        .navbar-left {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .navbar-brand .material-symbols-outlined {
-            font-size: 2rem;
-            color: #C1CEE5;
+        .navbar-user {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #F1F5FB;
+            padding: 0.5rem 1rem;
+            background: rgba(64, 26, 117, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(64, 26, 117, 0.5);
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
         }
 
         .navbar-links {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
-        .navbar-links a {
-            color: #F1F5FB;
+        .navbar-links a, .navbar-links button {
+            color: #C1CEE5;
             text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-family: inherit;
         }
 
-        .navbar-links a:hover {
-            background-color: #401a75;
+        .navbar-links a:hover, .navbar-links button:hover {
+            background: rgba(64, 26, 117, 0.4);
+            border-color: rgba(64, 26, 117, 0.6);
+            color: #F1F5FB;
+            transform: translateY(-1px);
+        }
+
+        .navbar-links a.active {
+            background: rgba(64, 26, 117, 0.5);
+            border-color: rgba(64, 26, 117, 0.7);
+            color: #F1F5FB;
+        }
+
+        .btn-logout {
+            background: rgba(45, 26, 31, 0.5);
+            color: #F9896B;
+            border: 1px solid rgba(248, 137, 107, 0.4);
+        }
+
+        .btn-logout:hover {
+            background: rgba(45, 26, 31, 0.8);
+            border-color: #F9896B;
+            color: #F9896B;
         }
 
         .container {
@@ -215,12 +255,30 @@
     @if(session('user_type'))
     <nav class="navbar">
         <div class="navbar-content">
-            <div class="navbar-links">
-                <span style="color: #F1F5FB; font-weight: 500;">{{ session('user_name') }}</span>
-                <form action="{{ session('user_type') === 'teacher' ? route('teacher.logout') : route('student.logout') }}" method="POST" style="display: inline;">
-                    @csrf
-                    <button type="submit" style="background: none; border: none; color: #F9896B; cursor: pointer; font-size: 1rem; padding: 0.5rem 1rem;">Logout</button>
-                </form>
+            <!-- Left Side: User Name -->
+            <div class="navbar-left">
+                <span class="navbar-user">{{ session('user_name') }}</span>
+            </div>
+
+            <!-- Right Side: Navigation Links -->
+            <div class="navbar-right">
+                <div class="navbar-links">
+                    @if(session('user_type') === 'teacher')
+                        <a href="{{ route('teacher.dashboard') }}" class="{{ request()->routeIs('teacher.dashboard') ? 'active' : '' }}">Dashboard</a>
+                        <a href="{{ route('teacher.profile') }}" class="{{ request()->routeIs('teacher.profile*') ? 'active' : '' }}">Profile</a>
+                        <form action="{{ route('teacher.logout') }}" method="POST" style="display: inline; margin: 0;">
+                            @csrf
+                            <button type="submit" class="btn-logout">Logout</button>
+                        </form>
+                    @else
+                        <a href="{{ route('student.dashboard') }}" class="{{ request()->routeIs('student.dashboard') ? 'active' : '' }}">Dashboard</a>
+                        <a href="{{ route('student.profile') }}" class="{{ request()->routeIs('student.profile*') ? 'active' : '' }}">Profile</a>
+                        <form action="{{ route('student.logout') }}" method="POST" style="display: inline; margin: 0;">
+                            @csrf
+                            <button type="submit" class="btn-logout">Logout</button>
+                        </form>
+                    @endif
+                </div>
             </div>
         </div>
     </nav>

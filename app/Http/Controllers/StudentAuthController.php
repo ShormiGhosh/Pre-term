@@ -359,4 +359,81 @@ class StudentAuthController extends Controller
 
         return redirect()->route('student.login')->with('success', 'Password reset successfully! Please login.');
     }
+
+    /**
+     * Show student profile page
+     */
+    public function showProfile()
+    {
+        $student = Student::find(session('user_id'));
+        return view('student.profile', compact('student'));
+    }
+
+    /**
+     * Show edit profile form
+     */
+    public function showEditProfile()
+    {
+        $student = Student::find(session('user_id'));
+        return view('student.edit-profile', compact('student'));
+    }
+
+    /**
+     * Update student profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $student = Student::find(session('user_id'));
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'department' => 'required|string|max:100',
+            'year' => 'required|integer|min:1|max:5',
+            'semester' => 'required|string|max:10',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Handle profile image upload
+        if ($request->hasFile('profile_image')) {
+            // Delete old image if exists
+            if ($student->profile_image && file_exists(public_path('uploads/profiles/' . $student->profile_image))) {
+                unlink(public_path('uploads/profiles/' . $student->profile_image));
+            }
+
+            $image = $request->file('profile_image');
+            $imageName = time() . '_' . $student->id . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/profiles'), $imageName);
+            $student->profile_image = $imageName;
+        }
+
+        $student->update([
+            'name' => $request->name,
+            'department' => $request->department,
+            'year' => $request->year,
+            'semester' => $request->semester,
+        ]);
+
+        // Update session data
+        session(['user_name' => $student->name]);
+
+        return redirect()->route('student.profile')->with('success', 'Profile updated successfully!');
+    }
+
+    /**
+     * Delete student account
+     */
+    public function deleteAccount()
+    {
+        $student = Student::find(session('user_id'));
+
+        // Delete profile image if exists
+        if ($student->profile_image && file_exists(public_path('uploads/profiles/' . $student->profile_image))) {
+            unlink(public_path('uploads/profiles/' . $student->profile_image));
+        }
+
+        $student->delete();
+        session()->flush();
+
+        return redirect()->route('home')->with('success', 'Your account has been deleted successfully.');
+    }
 }

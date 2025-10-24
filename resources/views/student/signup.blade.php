@@ -32,7 +32,7 @@
         </div>
 
         <div class="form-group">
-            <label for="roll_number" class="form-label">Roll Number</label>
+            <label for="roll_number" class="form-label">Roll</label>
             <input type="text" id="roll_number" name="roll_number" class="form-input" value="{{ old('roll_number') }}" placeholder="e.g., 2103001" required>
             @error('roll_number')
                 <span class="form-error">{{ $message }}</span>

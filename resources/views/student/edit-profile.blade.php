@@ -16,7 +16,6 @@
             </div>
         @endif
 
-        <!-- Update Profile Form -->
         <div style="background: #1c1a36; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);">
             <h2 style="color: #F1F5FB; font-size: 1.5rem; margin: 0 0 1.5rem 0; border-bottom: 2px solid #302e4a; padding-bottom: 0.75rem;">
                 Update Profile
@@ -39,7 +38,6 @@
                     </small>
                 </div>
 
-                <!-- Name -->
                 <div style="margin-bottom: 1.5rem;">
                     <label style="display: block; color: #C1CEE5; font-size: 0.9rem; margin-bottom: 0.5rem;">
                         Full Name
@@ -51,7 +49,6 @@
                            style="width: 100%; padding: 0.75rem; background: #302e4a; border: 1px solid #401a75; border-radius: 8px; color: #F1F5FB; font-size: 1rem;">
                 </div>
 
-                <!-- Department -->
                 <div style="margin-bottom: 1.5rem;">
                     <label style="display: block; color: #C1CEE5; font-size: 0.9rem; margin-bottom: 0.5rem;">
                         Department
@@ -63,7 +60,6 @@
                            style="width: 100%; padding: 0.75rem; background: #302e4a; border: 1px solid #401a75; border-radius: 8px; color: #F1F5FB; font-size: 1rem;">
                 </div>
 
-                <!-- Year and Semester -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                     <div>
                         <label style="display: block; color: #C1CEE5; font-size: 0.9rem; margin-bottom: 0.5rem;">

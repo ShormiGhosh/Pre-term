@@ -3,20 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeacherAuthController;
 use App\Http\Controllers\StudentAuthController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EmailHelper;
 use Illuminate\Support\Facades\Mail;
 
-/**
- * Home Route
- * Landing page with options to login as teacher or student
- */
 Route::get('/', function () {
     return view('home');
 })->name('home');
 
-/**
- * Test Email Route (Remove after testing)
- */
 Route::get('/test-email', function () {
     try {
         $testEmail = 'test@stud.kuet.ac.bd'; // Change this to your actual email
@@ -31,10 +25,6 @@ Route::get('/test-email', function () {
     }
 });
 
-/**
- * Teacher Routes
- * Handles teacher authentication, password reset, and dashboard
- */
 // Public routes (guest only)
 Route::get('/teacher/signup', [TeacherAuthController::class, 'showSignupForm'])->name('teacher.signup');
 Route::post('/teacher/signup', [TeacherAuthController::class, 'signup'])->name('teacher.signup.submit');
@@ -56,6 +46,11 @@ Route::middleware(['teacher.auth'])->group(function () {
     Route::get('/teacher/profile/edit', [TeacherAuthController::class, 'showEditProfile'])->name('teacher.profile.edit');
     Route::post('/teacher/profile/update', [TeacherAuthController::class, 'updateProfile'])->name('teacher.profile.update');
     Route::post('/teacher/profile/delete', [TeacherAuthController::class, 'deleteAccount'])->name('teacher.profile.delete');
+    
+    // Course management routes for teachers
+    Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
+    Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
+    
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });
 
@@ -89,5 +84,10 @@ Route::middleware(['student.auth'])->group(function () {
     Route::get('/student/profile/edit', [StudentAuthController::class, 'showEditProfile'])->name('student.profile.edit');
     Route::post('/student/profile/update', [StudentAuthController::class, 'updateProfile'])->name('student.profile.update');
     Route::post('/student/profile/delete', [StudentAuthController::class, 'deleteAccount'])->name('student.profile.delete');
+    
+    // Course enrollment routes for students
+    Route::post('/courses/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
+    Route::delete('/courses/{id}/unenroll', [CourseController::class, 'unenroll'])->name('courses.unenroll');
+    
     Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 });

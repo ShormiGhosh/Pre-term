@@ -43,7 +43,6 @@
 </div>
 
 <script>
-// Auto-format code input
 document.getElementById('code').addEventListener('input', function(e) {
     this.value = this.value.replace(/[^0-9]/g, '');
 });

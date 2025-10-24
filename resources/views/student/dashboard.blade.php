@@ -3,48 +3,465 @@
 @section('title', 'Student Dashboard')
 
 @section('content')
-<div class="card" style="max-width: 800px;">
-    <h1 class="card-title">Student Dashboard</h1>
-    
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .add-course-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        background: linear-gradient(135deg, #401a75, #5e2a9e);
+        color: #F1F5FB;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-bottom: 2rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .add-course-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(64, 26, 117, 0.3);
+    }
+
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .course-card {
+        background: linear-gradient(135deg, rgba(64, 26, 117, 0.2), rgba(94, 42, 158, 0.1));
+        border: 1px solid rgba(193, 206, 229, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: relative;
+        transition: transform 0.2s, box-shadow 0.2s;
+        backdrop-filter: blur(10px);
+    }
+
+    .course-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(64, 26, 117, 0.2);
+    }
+
+    .course-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .course-code {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #F1F5FB;
+        margin-bottom: 0.25rem;
+    }
+
+    .course-title {
+        font-size: 1rem;
+        color: #C1CEE5;
+        margin-bottom: 0.75rem;
+    }
+
+    .course-meta {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(193, 206, 229, 0.2);
+    }
+
+    .course-meta-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-meta-label {
+        font-size: 0.75rem;
+        color: #8894AC;
+        text-transform: uppercase;
+    }
+
+    .course-meta-value {
+        font-size: 0.875rem;
+        color: #F1F5FB;
+        font-weight: 500;
+    }
+
+    .three-dot-menu {
+        position: relative;
+    }
+
+    .three-dot-btn {
+        background: none;
+        border: none;
+        color: #C1CEE5;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        font-size: 1.25rem;
+        line-height: 1;
+    }
+
+    .three-dot-btn:hover {
+        color: #F1F5FB;
+    }
+
+    .dropdown-menu-custom {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: rgba(38, 41, 54, 0.95);
+        border: 1px solid rgba(193, 206, 229, 0.2);
+        border-radius: 8px;
+        padding: 0.5rem 0;
+        min-width: 140px;
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+    }
+
+    .dropdown-menu-custom.show {
+        display: block;
+    }
+
+    .dropdown-menu-custom button {
+        width: 100%;
+        padding: 0.625rem 1rem;
+        background: none;
+        border: none;
+        color: #F1F5FB;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .dropdown-menu-custom button:hover {
+        background: rgba(193, 206, 229, 0.1);
+    }
+
+    .subject-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 0.75rem;
+        opacity: 0.7;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, rgba(38, 41, 54, 0.95), rgba(64, 26, 117, 0.3));
+        border: 1px solid rgba(193, 206, 229, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        backdrop-filter: blur(20px);
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        color: #F1F5FB;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        display: block;
+        color: #C1CEE5;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        background: rgba(193, 206, 229, 0.1);
+        border: 1px solid rgba(193, 206, 229, 0.3);
+        border-radius: 8px;
+        color: #F1F5FB;
+        font-size: 1rem;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #401a75;
+        background: rgba(193, 206, 229, 0.15);
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 0.75rem;
+        background: rgba(193, 206, 229, 0.2);
+        color: #F1F5FB;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, #401a75, #5e2a9e);
+        color: #F1F5FB;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #8894AC;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+</style>
+
+<div class="dashboard-container">
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <div class="dashboard-card">
-        <h2 style="color: #C1CEE5; margin-bottom: 1rem;">Welcome, {{ session('user_name') }}!</h2>
-        
-        <div class="user-info">
-            <p><strong>Email:</strong> {{ session('user_email') }}</p>
-            <p><strong>Role:</strong> Student</p>
-            <p><strong>User ID:</strong> {{ session('user_id') }}</p>
-        </div>
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
 
-        <p style="color: #F1F5FB; margin-top: 1rem;">
-            This is your dashboard where you can:
-        </p>
-        
-        <ul style="margin: 1rem 0; padding-left: 2rem; color: #C1CEE5;">
-            <li>View your attendance records</li>
-            <li>Check CT schedules</li>
-            <li>View CT marks</li>
-            <li>Track your class performance</li>
-            <li>Monitor if you're eligible for term finals (60% attendance)</li>
-        </ul>
+    <button class="add-course-btn" onclick="openEnrollModal()">
+        <span style="font-size: 1.5rem; line-height: 1;">+</span>
+        Enroll in Courses
+    </button>
+
+    <div class="courses-grid">
+        @forelse(auth()->guard('student')->user()->courses as $course)
+            <div class="course-card" style="background: linear-gradient(135deg, 
+                @if(str_contains($course->course_code, 'CSE') || str_contains($course->course_code, 'EEE'))
+                    rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1)
+                @elseif(str_contains($course->course_code, 'ME') || str_contains($course->course_code, 'IPE'))
+                    rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1)
+                @elseif(str_contains($course->course_code, 'CE') || str_contains($course->course_code, 'URP'))
+                    rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.1)
+                @else
+                    rgba(168, 85, 247, 0.2), rgba(147, 51, 234, 0.1)
+                @endif
+            );">
+                <div class="course-header">
+                    <div>
+                        <svg class="subject-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <div class="course-code">{{ $course->course_code }}</div>
+                        <div class="course-title">{{ $course->course_title }}</div>
+                    </div>
+                    <div class="three-dot-menu">
+                        <button class="three-dot-btn" onclick="toggleDropdown({{ $course->id }})">⋮</button>
+                        <div id="dropdown-{{ $course->id }}" class="dropdown-menu-custom">
+                            <form action="{{ route('courses.unenroll', $course->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" onclick="return confirm('Are you sure you want to unenroll from this course?')">Unenroll</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-meta">
+                    <div class="course-meta-item">
+                        <span class="course-meta-label">Instructor</span>
+                        <span class="course-meta-value">{{ $course->teacher->name }}</span>
+                    </div>
+                    <div class="course-meta-item">
+                        <span class="course-meta-label">Credit</span>
+                        <span class="course-meta-value">{{ $course->course_credit }}</span>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <p>No courses enrolled yet</p>
+                <p style="font-size: 0.875rem; margin-top: 0.5rem;">Click "Enroll in Course" to get started</p>
+            </div>
+        @endforelse
     </div>
+</div>
 
-    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-        <a href="{{ route('student.profile') }}" 
-           style="flex: 1; padding: 0.875rem; background: #401a75; color: #F1F5FB; border: none; border-radius: 8px; font-size: 1rem; font-weight: 500; cursor: pointer; text-align: center; text-decoration: none; display: inline-block;">
-            View Profile
-        </a>
-        
-        <form action="{{ route('student.logout') }}" method="POST" style="flex: 1;">
+<!-- Enrollment Modal -->
+<div id="enrollModal" class="modal-overlay" onclick="if(event.target === this) closeEnrollModal()">
+    <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+        <h2 class="modal-title">Enroll in Courses</h2>
+        <form action="{{ route('courses.enroll') }}" method="POST">
             @csrf
-            <button type="submit" class="btn btn-danger" style="width: 100%;">
-                Logout
-            </button>
+            <div class="form-group">
+                @php
+                    $allCourses = \App\Models\Course::with('teacher')->get();
+                    $enrolledCourseIds = auth()->guard('student')->user()->courses->pluck('id')->toArray();
+                    $availableCourses = $allCourses->whereNotIn('id', $enrolledCourseIds);
+                @endphp
+                
+                @if($availableCourses->count() > 0)
+                    <label class="form-label" style="margin-bottom: 1rem;">Select courses to enroll:</label>
+                    <div style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
+                        @foreach($availableCourses as $course)
+                            <label class="course-checkbox-item">
+                                <input type="checkbox" name="course_ids[]" value="{{ $course->id }}" class="course-checkbox">
+                                <div class="course-checkbox-content">
+                                    <div class="course-checkbox-code">{{ $course->course_code }}</div>
+                                    <div class="course-checkbox-title">{{ $course->course_title }}</div>
+                                    <div class="course-checkbox-teacher">Instructor: {{ $course->teacher->name }}</div>
+                                    <div class="course-checkbox-credit">Credit: {{ $course->course_credit }}</div>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                @else
+                    <p style="color: #8894AC; text-align: center; padding: 2rem;">
+                        No available courses to enroll. You are either enrolled in all courses or no courses have been created yet.
+                    </p>
+                @endif
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeEnrollModal()">Cancel</button>
+                @if($availableCourses->count() > 0)
+                    <button type="submit" class="btn-submit">Enroll in Selected</button>
+                @endif
+            </div>
         </form>
     </div>
 </div>
+
+<style>
+    .course-checkbox-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        background: rgba(193, 206, 229, 0.05);
+        border: 2px solid rgba(193, 206, 229, 0.2);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .course-checkbox-item:hover {
+        background: rgba(193, 206, 229, 0.1);
+        border-color: rgba(193, 206, 229, 0.3);
+    }
+
+    .course-checkbox-item:has(.course-checkbox:checked) {
+        background: rgba(64, 26, 117, 0.2);
+        border-color: #401a75;
+    }
+
+    .course-checkbox {
+        width: 20px;
+        height: 20px;
+        margin-top: 0.25rem;
+        cursor: pointer;
+        accent-color: #401a75;
+    }
+
+    .course-checkbox-content {
+        flex: 1;
+    }
+
+    .course-checkbox-code {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #F1F5FB;
+        margin-bottom: 0.25rem;
+    }
+
+    .course-checkbox-title {
+        font-size: 0.875rem;
+        color: #C1CEE5;
+        margin-bottom: 0.5rem;
+    }
+
+    .course-checkbox-teacher {
+        font-size: 0.75rem;
+        color: #8894AC;
+        margin-bottom: 0.25rem;
+    }
+
+    .course-checkbox-credit {
+        font-size: 0.75rem;
+        color: #8894AC;
+    }
+</style>
+
+<script>
+function openEnrollModal() {
+    document.getElementById('enrollModal').classList.add('show');
+}
+
+function closeEnrollModal() {
+    document.getElementById('enrollModal').classList.remove('show');
+}
+
+function toggleDropdown(courseId) {
+    const dropdown = document.getElementById('dropdown-' + courseId);
+    const allDropdowns = document.querySelectorAll('.dropdown-menu-custom');
+    
+    // Close all other dropdowns
+    allDropdowns.forEach(d => {
+        if (d !== dropdown) {
+            d.classList.remove('show');
+        }
+    });
+    
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.three-dot-menu')) {
+        document.querySelectorAll('.dropdown-menu-custom').forEach(d => {
+            d.classList.remove('show');
+        });
+    }
+});
+</script>
 @endsection
 

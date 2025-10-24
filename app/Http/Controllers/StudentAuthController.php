@@ -107,12 +107,13 @@ class StudentAuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Find student by email
-        $student = Student::where('email', $credentials['email'])->first();
-
-        // Check if student exists and password matches
-        if ($student && Hash::check($credentials['password'], $student->password)) {
-            // Store student info in session
+        // Attempt to log in using the student guard
+        if (Auth::guard('student')->attempt($credentials)) {
+            $request->session()->regenerate();
+            
+            $student = Auth::guard('student')->user();
+            
+            // Store additional info in session for backward compatibility
             session([
                 'user_id' => $student->id,
                 'user_type' => 'student',
@@ -126,7 +127,7 @@ class StudentAuthController extends Controller
         // Authentication failed
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
-        ])->withInput();
+        ])->withInput($request->only('email'));
     }
 
     /**
@@ -134,8 +135,10 @@ class StudentAuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // Clear all session data
-        $request->session()->flush();
+        Auth::guard('student')->logout();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('student.login')->with('success', 'Logged out successfully!');
     }

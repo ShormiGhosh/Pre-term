@@ -15,9 +15,6 @@ class Student extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The table associated with the model.
-     */
     protected $table = 'students';
 
     /**
@@ -53,5 +50,21 @@ class Student extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get all courses this student is enrolled in
+     */
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_enrollments');
+    }
+
+    /**
+     * Get all enrollments for this student
+     */
+    public function enrollments()
+    {
+        return $this->hasMany(CourseEnrollment::class);
     }
 }

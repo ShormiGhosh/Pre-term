@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Course extends Model
+{
+    protected $fillable = [
+        'course_code',
+        'course_title',
+        'course_credit',
+        'teacher_id',
+        'department',
+    ];
+
+    /**
+     * Get the teacher who owns the course
+     */
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
+    }
+
+    /**
+     * Get all students enrolled in this course
+     */
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'course_enrollments');
+    }
+
+    /**
+     * Get all enrollments for this course
+     */
+    public function enrollments()
+    {
+        return $this->hasMany(CourseEnrollment::class);
+    }
+}

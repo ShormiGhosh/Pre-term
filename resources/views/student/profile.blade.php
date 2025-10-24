@@ -57,37 +57,31 @@
         <!-- Profile Information Grid -->
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;">
             
-            <!-- Email -->
             <div style="background: #302e4a; padding: 1.5rem; border-radius: 8px;">
                 <p style="color: #C1CEE5; font-size: 0.9rem; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Email Address</p>
                 <p style="color: #F1F5FB; font-size: 1.1rem; margin: 0; word-break: break-word;">{{ $student->email }}</p>
             </div>
 
-            <!-- Roll Number -->
             <div style="background: #302e4a; padding: 1.5rem; border-radius: 8px;">
-                <p style="color: #C1CEE5; font-size: 0.9rem; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Roll Number</p>
+                <p style="color: #C1CEE5; font-size: 0.9rem; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Roll</p>
                 <p style="color: #F1F5FB; font-size: 1.1rem; margin: 0;">{{ $student->roll_number }}</p>
             </div>
 
-            <!-- Department -->
             <div style="background: #302e4a; padding: 1.5rem; border-radius: 8px;">
                 <p style="color: #C1CEE5; font-size: 0.9rem; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Department</p>
                 <p style="color: #F1F5FB; font-size: 1.1rem; margin: 0;">{{ $student->department }}</p>
             </div>
 
-            <!-- Year -->
             <div style="background: #302e4a; padding: 1.5rem; border-radius: 8px;">
                 <p style="color: #C1CEE5; font-size: 0.9rem; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Year</p>
                 <p style="color: #F1F5FB; font-size: 1.1rem; margin: 0;">Year {{ $student->year }}</p>
             </div>
 
-            <!-- Semester -->
             <div style="background: #302e4a; padding: 1.5rem; border-radius: 8px;">
                 <p style="color: #C1CEE5; font-size: 0.9rem; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Semester</p>
                 <p style="color: #F1F5FB; font-size: 1.1rem; margin: 0;">{{ $student->semester }}</p>
             </div>
 
-            <!-- Email Verification Status -->
             <div style="background: #302e4a; padding: 1.5rem; border-radius: 8px;">
                 <p style="color: #C1CEE5; font-size: 0.9rem; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.5px;">Email Status</p>
                 <p style="color: {{ $student->email_verified ? '#4ade80' : '#F9896B' }}; font-size: 1.1rem; margin: 0; font-weight: 500;">

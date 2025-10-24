@@ -4,13 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * StudentAuth Middleware
- * Protects routes that should only be accessible by authenticated students
- * Checks if user is logged in as a student via session
- */
 class StudentAuth
 {
     /**
@@ -20,9 +16,8 @@ class StudentAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if user is logged in and is a student
-        if (!session()->has('user_id') || session('user_type') !== 'student') {
-            // Not authenticated as student, redirect to student login
+        // Check if user is authenticated via student guard
+        if (!Auth::guard('student')->check()) {
             return redirect()->route('student.login')->with('error', 'Please login as student to access this page.');
         }
 

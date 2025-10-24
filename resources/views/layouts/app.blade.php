@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - Pre-term System</title>
+    <title>@yield('title') - PreTerm</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         * {
@@ -11,7 +11,6 @@
             padding: 0;
             box-sizing: border-box;
         } 
-/*  */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #100f21;
@@ -255,12 +254,10 @@
     @if(session('user_type'))
     <nav class="navbar">
         <div class="navbar-content">
-            <!-- Left Side: User Name -->
             <div class="navbar-left">
                 <span class="navbar-user">{{ session('user_name') }}</span>
             </div>
 
-            <!-- Right Side: Navigation Links -->
             <div class="navbar-right">
                 <div class="navbar-links">
                     @if(session('user_type') === 'teacher')

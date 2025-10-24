@@ -210,7 +210,7 @@
 <body>
     <div class="home-container">
         <div class="logo">
-            <span class="material-symbols-outlined" style="font-size: 6rem;">groups_3</span>
+            <span class="material-symbols-outlined" style="font-size: 8rem;">groups_3</span>
         </div>
         <h1 class="home-title">
             <span style="color: #C1CEE5;">Pre</span><span style="color: #401a75;">Term</span>

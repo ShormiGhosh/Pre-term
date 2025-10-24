@@ -89,12 +89,13 @@ class TeacherAuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Find teacher by email
-        $teacher = Teacher::where('email', $credentials['email'])->first();
-
-        // Check if teacher exists and password matches
-        if ($teacher && Hash::check($credentials['password'], $teacher->password)) {
-            // Store teacher info in session
+        // Attempt to log in using the teacher guard
+        if (Auth::guard('teacher')->attempt($credentials)) {
+            $request->session()->regenerate();
+            
+            $teacher = Auth::guard('teacher')->user();
+            
+            // Store additional info in session for backward compatibility
             session([
                 'user_id' => $teacher->id,
                 'user_type' => 'teacher',
@@ -108,7 +109,7 @@ class TeacherAuthController extends Controller
         // Authentication failed
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
-        ])->withInput();
+        ])->withInput($request->only('email'));
     }
 
     /**
@@ -116,8 +117,10 @@ class TeacherAuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // Clear all session data
-        $request->session()->flush();
+        Auth::guard('teacher')->logout();
+        
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('teacher.login')->with('success', 'Logged out successfully!');
     }

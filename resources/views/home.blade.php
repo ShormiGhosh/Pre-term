@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pre-term Attendance System</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -39,11 +40,48 @@
             z-index: 0;
         }
 
+        .navbar {
+            background-color: #302e4a;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FFFFFF;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand .material-symbols-outlined {
+            font-size: 2rem;
+            color: #C1CEE5;
+        }
+
         .home-container {
             text-align: center;
             color: #F1F5FB;
             position: relative;
             z-index: 1;
+        }
+
+        .logo {
+            font-size: 6rem;
+            margin-bottom: 0.5rem;
+            color: #401a75;
         }
 
         .home-title {
@@ -170,7 +208,12 @@
 </head>
 <body>
     <div class="home-container">
-        <h1 class="home-title">Pre-term Attendance System</h1>
+        <div class="logo">
+            <span class="material-symbols-outlined" style="font-size: 6rem;">groups_3</span>
+        </div>
+        <h1 class="home-title">
+            <span style="color: #C1CEE5;">Pre</span><span style="color: #401a75;">Term</span>
+        </h1>
         <p class="home-subtitle">Track attendance, CT marks, and class performance - All in one place</p>
 
         <div class="cards-container">
@@ -191,17 +234,6 @@
                     <a href="{{ route('student.signup') }}" class="btn btn-secondary">Sign Up as Student</a>
                 </div>
             </div>
-        </div>
-
-        <div class="features">
-            <h3>System Features</h3>
-            <ul>
-                <li><span class="material-icons">check_circle</span>Attendance tracking with 60% eligibility alerts</li>
-                <li><span class="material-icons">check_circle</span>CT schedule and marks management</li>
-                <li><span class="material-icons">check_circle</span>Class performance records (20 marks)</li>
-                <li><span class="material-icons">check_circle</span>Teacher-wise mark distribution</li>
-                <li><span class="material-icons">check_circle</span>Real-time eligibility status for term finals</li>
-            </ul>
         </div>
     </div>
 </body>

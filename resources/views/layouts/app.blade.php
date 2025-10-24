@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Pre-term System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
+        } 
 /*  */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -38,6 +39,14 @@
             font-weight: bold;
             color: #FFFFFF;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand .material-symbols-outlined {
+            font-size: 2rem;
+            color: #C1CEE5;
         }
 
         .navbar-links {
@@ -206,7 +215,6 @@
     @if(session('user_type'))
     <nav class="navbar">
         <div class="navbar-content">
-            <a href="/" class="navbar-brand">Pre-term System</a>
             <div class="navbar-links">
                 <span style="color: #F1F5FB; font-weight: 500;">{{ session('user_name') }}</span>
                 <form action="{{ session('user_type') === 'teacher' ? route('teacher.logout') : route('student.logout') }}" method="POST" style="display: inline;">

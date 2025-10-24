@@ -13,16 +13,16 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #100f21;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
         .navbar {
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: #302e4a;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .navbar-content {
@@ -36,7 +36,7 @@
         .navbar-brand {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #667eea;
+            color: #FFFFFF;
             text-decoration: none;
         }
 
@@ -46,7 +46,7 @@
         }
 
         .navbar-links a {
-            color: #333;
+            color: #F1F5FB;
             text-decoration: none;
             padding: 0.5rem 1rem;
             border-radius: 5px;
@@ -54,7 +54,7 @@
         }
 
         .navbar-links a:hover {
-            background-color: #f0f0f0;
+            background-color: #401a75;
         }
 
         .container {
@@ -66,9 +66,9 @@
         }
 
         .card {
-            background: white;
+            background: #1c1a36;
             border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             padding: 2rem;
             width: 100%;
             max-width: 500px;
@@ -76,7 +76,7 @@
 
         .card-title {
             font-size: 2rem;
-            color: #333;
+            color: #F1F5FB;
             margin-bottom: 1.5rem;
             text-align: center;
         }
@@ -88,15 +88,15 @@
         }
 
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background-color: #302e4a;
+            color: #C1CEE5;
+            border: 1px solid #401a75;
         }
 
         .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background-color: #F9896B;
+            color: #FFFFFF;
+            border: 1px solid #F9896B;
         }
 
         .form-group {
@@ -106,26 +106,28 @@
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #555;
+            color: #C1CEE5;
             font-weight: 500;
         }
 
         .form-input {
             width: 100%;
             padding: 0.75rem;
-            border: 2px solid #ddd;
+            border: 2px solid #302e4a;
             border-radius: 5px;
             font-size: 1rem;
             transition: border-color 0.3s;
+            background-color: #100f21;
+            color: #F1F5FB;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #401a75;
         }
 
         .form-error {
-            color: #dc3545;
+            color: #F9896B;
             font-size: 0.875rem;
             margin-top: 0.25rem;
         }
@@ -142,22 +144,23 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background-color: #302e4a;
+            color: #FFFFFF;
         }
 
         .btn-primary:hover {
+            background-color: #401a75;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(64, 26, 117, 0.5);
         }
 
         .btn-danger {
-            background-color: #dc3545;
-            color: white;
+            background-color: #401a75;
+            color: #FFFFFF;
         }
 
         .btn-danger:hover {
-            background-color: #c82333;
+            background-color: #302e4a;
         }
 
         .text-center {
@@ -165,12 +168,13 @@
         }
 
         .link {
-            color: #667eea;
+            color: #C1CEE5;
             text-decoration: none;
         }
 
         .link:hover {
             text-decoration: underline;
+            color: #401a75;
         }
 
         .mt-3 {
@@ -178,15 +182,15 @@
         }
 
         .dashboard-card {
-            background: white;
+            background: #1c1a36;
             border-radius: 10px;
             padding: 2rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .user-info {
-            background-color: #f8f9fa;
+            background-color: #302e4a;
             padding: 1rem;
             border-radius: 5px;
             margin-bottom: 1rem;
@@ -194,7 +198,7 @@
 
         .user-info p {
             margin: 0.5rem 0;
-            color: #555;
+            color: #C1CEE5;
         }
     </style>
 </head>
@@ -204,10 +208,10 @@
         <div class="navbar-content">
             <a href="/" class="navbar-brand">Pre-term System</a>
             <div class="navbar-links">
-                <span style="color: #667eea; font-weight: 500;">{{ session('user_name') }}</span>
+                <span style="color: #F1F5FB; font-weight: 500;">{{ session('user_name') }}</span>
                 <form action="{{ session('user_type') === 'teacher' ? route('teacher.logout') : route('student.logout') }}" method="POST" style="display: inline;">
                     @csrf
-                    <button type="submit" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 1rem; padding: 0.5rem 1rem;">Logout</button>
+                    <button type="submit" style="background: none; border: none; color: #F9896B; cursor: pointer; font-size: 1rem; padding: 0.5rem 1rem;">Logout</button>
                 </form>
             </div>
         </div>
@@ -219,3 +223,4 @@
     </div>
 </body>
 </html>
+

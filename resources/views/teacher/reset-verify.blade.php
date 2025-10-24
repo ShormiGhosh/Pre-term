@@ -14,13 +14,7 @@
         <div class="alert alert-error">{{ session('error') }}</div>
     @endif
 
-    @if(session('verification_code'))
-        <div class="alert alert-success">
-            <strong>For Development/Testing:</strong> Your reset code is: <strong>{{ session('verification_code') }}</strong>
-        </div>
-    @endif
-
-    <p style="color: #666; margin-bottom: 1.5rem; text-align: center;">
+    <p style="color: #C1CEE5; margin-bottom: 1.5rem; text-align: center;">
         We've sent a 6-digit reset code to<br>
         <strong>{{ session('reset_email') }}</strong>
     </p>
@@ -51,3 +45,4 @@ document.getElementById('code').addEventListener('input', function(e) {
 });
 </script>
 @endsection
+

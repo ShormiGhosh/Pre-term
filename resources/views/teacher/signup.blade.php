@@ -51,7 +51,7 @@
             <label for="password" class="form-label">Password</label>
             <div style="position: relative;">
                 <input type="password" id="password" name="password" class="form-input" style="padding-right: 45px;" required>
-                <button type="button" onclick="togglePassword('password', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; padding: 0; display: flex; align-items: center;">
+                <button type="button" onclick="togglePassword('password', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #C1CEE5; padding: 0; display: flex; align-items: center;">
                     <span class="material-icons" style="font-size: 20px;">visibility_off</span>
                 </button>
             </div>
@@ -64,7 +64,7 @@
             <label for="password_confirmation" class="form-label">Confirm Password</label>
             <div style="position: relative;">
                 <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" style="padding-right: 45px;" required>
-                <button type="button" onclick="togglePassword('password_confirmation', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; padding: 0; display: flex; align-items: center;">
+                <button type="button" onclick="togglePassword('password_confirmation', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #C1CEE5; padding: 0; display: flex; align-items: center;">
                     <span class="material-icons" style="font-size: 20px;">visibility_off</span>
                 </button>
             </div>
@@ -94,3 +94,4 @@ function togglePassword(fieldId, button) {
 }
 </script>
 @endsection
+

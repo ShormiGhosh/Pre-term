@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeacherAuthController;
 use App\Http\Controllers\StudentAuthController;
+use App\Http\Controllers\EmailHelper;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Home Route
@@ -11,6 +13,23 @@ use App\Http\Controllers\StudentAuthController;
 Route::get('/', function () {
     return view('home');
 })->name('home');
+
+/**
+ * Test Email Route (Remove after testing)
+ */
+Route::get('/test-email', function () {
+    try {
+        $testEmail = 'test@stud.kuet.ac.bd'; // Change this to your actual email
+        $code = '123456';
+        $name = 'Test User';
+        
+        EmailHelper::sendVerificationEmail($testEmail, $code, $name, 'signup');
+        
+        return 'Email sent successfully! Check your inbox at: ' . $testEmail;
+    } catch (\Exception $e) {
+        return 'Email failed: ' . $e->getMessage();
+    }
+});
 
 /**
  * Teacher Routes

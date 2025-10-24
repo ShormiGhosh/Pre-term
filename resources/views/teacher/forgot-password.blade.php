@@ -14,7 +14,7 @@
         <div class="alert alert-error">{{ session('error') }}</div>
     @endif
 
-    <p style="color: #666; margin-bottom: 1.5rem; text-align: center;">
+    <p style="color: #C1CEE5; margin-bottom: 1.5rem; text-align: center;">
         Enter your email address and we'll send you a code to reset your password.
     </p>
 
@@ -37,3 +37,4 @@
     </div>
 </div>
 @endsection
+

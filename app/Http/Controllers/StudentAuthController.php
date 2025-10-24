@@ -112,31 +112,6 @@ class StudentAuthController extends Controller
 
         // Check if student exists and password matches
         if ($student && Hash::check($credentials['password'], $student->password)) {
-            // Check if email is verified
-            if (!$student->email_verified) {
-                // Generate new verification code
-                $code = VerificationCode::generateCode();
-                
-                VerificationCode::create([
-                    'email' => $student->email,
-                    'code' => $code,
-                    'type' => 'signup',
-                    'expires_at' => now()->addMinutes(15),
-                ]);
-
-                // Send verification email again
-                EmailHelper::sendVerificationEmail($student->email, $code, $student->name, 'signup');
-
-                session([
-                    'pending_verification_email' => $student->email,
-                    'pending_verification_name' => $student->name,
-                ]);
-
-                return redirect()->route('student.verify.show')
-                       ->with('error', 'Please verify your email first. A new verification code has been sent.')
-                       ->with('verification_code', $code);
-            }
-
             // Store student info in session
             session([
                 'user_id' => $student->id,

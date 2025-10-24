@@ -35,13 +35,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(16, 15, 33, 0.9);
             z-index: 0;
         }
 
         .home-container {
             text-align: center;
-            color: white;
+            color: #F1F5FB;
             position: relative;
             z-index: 1;
         }
@@ -49,13 +49,15 @@
         .home-title {
             font-size: 3rem;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: #FFFFFF;
         }
 
         .home-subtitle {
             font-size: 1.2rem;
             margin-bottom: 3rem;
-            opacity: 0.9;
+            opacity: 0.95;
+            color: #C1CEE5;
         }
 
         .cards-container {
@@ -67,26 +69,26 @@
         }
 
         .portal-card {
-            background: white;
+            background: #1c1a36;
             border-radius: 15px;
             padding: 2rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .portal-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 50px rgba(64, 26, 117, 0.6);
         }
 
         .portal-card h2 {
-            color: #667eea;
+            color: #C1CEE5;
             margin-bottom: 1rem;
             font-size: 1.8rem;
         }
 
         .portal-card p {
-            color: #666;
+            color: #F1F5FB;
             margin-bottom: 1.5rem;
             line-height: 1.6;
         }
@@ -110,35 +112,40 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background-color: #302e4a;
+            color: #FFFFFF;
         }
 
         .btn-primary:hover {
+            background-color: #401a75;
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(64, 26, 117, 0.6);
         }
 
         .btn-secondary {
-            background-color: #6c757d;
-            color: white;
+            background-color: #1c1a36;
+            color: #C1CEE5;
+            border: 1px solid #302e4a;
         }
 
         .btn-secondary:hover {
-            background-color: #5a6268;
+            background-color: #302e4a;
+            color: #FFFFFF;
         }
 
         .features {
             margin-top: 3rem;
-            background: rgba(255,255,255,0.1);
+            background: rgba(48, 46, 74, 0.4);
             padding: 2rem;
             border-radius: 10px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(64, 26, 117, 0.3);
         }
 
         .features h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
+            color: #FFFFFF;
         }
 
         .features ul {
@@ -148,14 +155,16 @@
 
         .features li {
             padding: 0.5rem 0;
-            opacity: 0.9;
+            opacity: 0.95;
             display: flex;
             align-items: center;
+            color: #C1CEE5;
         }
 
         .features li .material-icons {
             margin-right: 0.5rem;
             font-size: 20px;
+            color: #401a75;
         }
     </style>
 </head>
@@ -197,3 +206,4 @@
     </div>
 </body>
 </html>
+

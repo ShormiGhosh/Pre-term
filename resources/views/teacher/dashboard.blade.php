@@ -10,6 +10,19 @@
         padding: 2rem 1rem;
     }
 
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-title {
+        font-size: 1.5rem;
+        color: #F1F5FB;
+        font-weight: 600;
+    }
+
     .add-course-btn {
         display: inline-flex;
         align-items: center;
@@ -22,7 +35,6 @@
         font-size: 1rem;
         font-weight: 500;
         cursor: pointer;
-        margin-bottom: 2rem;
         transition: transform 0.2s, box-shadow 0.2s;
     }
 
@@ -32,10 +44,10 @@
     }
 
     .courses-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 1.5rem;
-        margin-top: 2rem;
+        margin-top: 1rem;
     }
 
     .course-card {
@@ -46,6 +58,8 @@
         position: relative;
         transition: transform 0.2s, box-shadow 0.2s;
         backdrop-filter: blur(10px);
+        min-width: 320px;
+        max-width: 320px;
     }
 
     .course-card:hover {

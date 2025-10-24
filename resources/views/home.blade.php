@@ -15,7 +15,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url('{{ asset('images/kuet_bg.webp') }}');
+            background-image: url('/images/kuet_bg.webp');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;

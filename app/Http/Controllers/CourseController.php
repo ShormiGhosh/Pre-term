@@ -28,6 +28,34 @@ class CourseController extends Controller
     }
 
     /**
+     * Show course details page
+     */
+    public function show($id)
+    {
+        $course = Course::with('teacher', 'students')->findOrFail($id);
+        
+        // Check if user has access to this course
+        $user = Auth::guard('teacher')->check() ? Auth::guard('teacher')->user() : Auth::guard('student')->user();
+        
+        // Teachers can only view their own courses
+        if ($user instanceof \App\Models\Teacher && $course->teacher_id !== $user->id) {
+            return redirect()->back()->with('error', 'Unauthorized access.');
+        }
+        
+        // Students can only view enrolled courses
+        if ($user instanceof \App\Models\Student) {
+            $isEnrolled = CourseEnrollment::where('student_id', $user->id)
+                                          ->where('course_id', $course->id)
+                                          ->exists();
+            if (!$isEnrolled) {
+                return redirect()->back()->with('error', 'You are not enrolled in this course.');
+            }
+        }
+        
+        return view('courses.show', compact('course', 'user'));
+    }
+
+    /**
      * Store a newly created course
      */
     public function store(Request $request)

@@ -269,21 +269,54 @@
         margin-bottom: 1rem;
         opacity: 0.3;
     }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .alert-success {
+        background: rgba(34, 197, 94, 0.2);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        color: #4ade80;
+    }
+
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #f87171;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
 </style>
 
 <div class="dashboard-container">
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success" id="successAlert">{{ session('success') }}</div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <div class="alert alert-danger" id="errorAlert">{{ session('error') }}</div>
     @endif
 
-    <button class="add-course-btn" onclick="openAddCourseModal()">
-        <span style="font-size: 1.5rem; line-height: 1;">+</span>
-        Add Course
-    </button>
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">My Courses</h1>
+        <button class="add-course-btn" onclick="openAddCourseModal()">
+            <span style="font-size: 1.5rem; line-height: 1;">+</span>
+            Add Course
+        </button>
+    </div>
 
     <div class="courses-grid">
         @forelse(auth()->guard('teacher')->user()->courses as $course)
@@ -397,6 +430,24 @@ document.addEventListener('click', function(event) {
         });
     }
 });
+
+// Auto-dismiss alerts after 3 seconds
+setTimeout(function() {
+    const successAlert = document.getElementById('successAlert');
+    const errorAlert = document.getElementById('errorAlert');
+    
+    if (successAlert) {
+        successAlert.style.transition = 'opacity 0.5s';
+        successAlert.style.opacity = '0';
+        setTimeout(() => successAlert.remove(), 500);
+    }
+    
+    if (errorAlert) {
+        errorAlert.style.transition = 'opacity 0.5s';
+        errorAlert.style.opacity = '0';
+        setTimeout(() => errorAlert.remove(), 500);
+    }
+}, 3000);
 </script>
 @endsection
 

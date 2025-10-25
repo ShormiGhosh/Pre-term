@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'teacher.auth' => \App\Http\Middleware\TeacherAuth::class,
             'student.auth' => \App\Http\Middleware\StudentAuth::class,
         ]);
+        
+        // Trust all proxies for dev tunnels
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

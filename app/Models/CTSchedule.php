@@ -27,6 +27,14 @@ class CTSchedule extends Model
         return $this->belongsTo(Course::class);
     }
 
+    /**
+     * A CT schedule has many marks
+     */
+    public function marks()
+    {
+        return $this->hasMany(CTMark::class);
+    }
+
     public function isUpcoming()
     {
         return $this->ct_datetime > now();

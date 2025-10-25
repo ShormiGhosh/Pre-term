@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\CTSchedule;
+use App\Models\CTMark;
 use App\Mail\CTScheduleNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -77,5 +78,104 @@ class CTScheduleController extends Controller
             'success' => true,
             'message' => 'CT marked as past'
         ]);
+    }
+
+    /**
+     * Save CT marks for all students
+     */
+    public function saveMarks(Request $request, $courseId)
+    {
+        $teacher = Auth::guard('teacher')->user();
+        $course = Course::findOrFail($courseId);
+        
+        // Verify teacher owns this course
+        if ($course->teacher_id !== $teacher->id) {
+            return redirect()->back()->with('error', 'Unauthorized access.');
+        }
+
+        $validated = $request->validate([
+            'marks' => 'required|array',
+            'marks.*.student_id' => 'required|exists:students,id',
+            'marks.*.ct_schedule_id' => 'required|exists:ct_schedules,id',
+            'marks.*.marks_obtained' => 'nullable|numeric|min:0',
+        ]);
+
+        foreach ($validated['marks'] as $markData) {
+            // Get total marks for validation
+            $ctSchedule = CTSchedule::find($markData['ct_schedule_id']);
+            
+            // Validate marks don't exceed total
+            if (isset($markData['marks_obtained']) && $markData['marks_obtained'] > $ctSchedule->total_marks) {
+                return redirect()->back()->with('error', 
+                    "Marks cannot exceed total marks ({$ctSchedule->total_marks}) for {$ctSchedule->ct_name}");
+            }
+
+            // Update or create mark
+            CTMark::updateOrCreate(
+                [
+                    'ct_schedule_id' => $markData['ct_schedule_id'],
+                    'student_id' => $markData['student_id'],
+                    'course_id' => $courseId
+                ],
+                [
+                    'marks_obtained' => $markData['marks_obtained'] ?? null
+                ]
+            );
+        }
+
+        return redirect()->back()->with('success', 'CT marks saved successfully!');
+    }
+
+    /**
+     * Download CT marks as PDF
+     */
+    public function downloadMarks($courseId)
+    {
+        $teacher = Auth::guard('teacher')->user();
+        $course = Course::with(['students', 'ctSchedules'])->findOrFail($courseId);
+        
+        // Verify teacher owns this course
+        if ($course->teacher_id !== $teacher->id) {
+            return redirect()->back()->with('error', 'Unauthorized access.');
+        }
+
+        // Get all CT schedules for this course
+        $ctSchedules = $course->ctSchedules()->orderBy('ct_datetime', 'asc')->get();
+        
+        // Get all enrolled students
+        $students = $course->students()->orderBy('roll_number', 'asc')->get();
+        
+        // Prepare marks data
+        $marksData = [];
+        foreach ($students as $student) {
+            $studentMarks = [
+                'roll' => $student->roll_number,
+                'name' => $student->name,
+                'marks' => []
+            ];
+            
+            foreach ($ctSchedules as $ct) {
+                $mark = CTMark::where('student_id', $student->id)
+                             ->where('ct_schedule_id', $ct->id)
+                             ->first();
+                             
+                $studentMarks['marks'][$ct->id] = $mark ? $mark->marks_obtained : '-';
+            }
+            
+            $marksData[] = $studentMarks;
+        }
+        
+        // Calculate class averages
+        $classAverages = [];
+        foreach ($ctSchedules as $ct) {
+            $marks = CTMark::where('ct_schedule_id', $ct->id)
+                          ->whereNotNull('marks_obtained')
+                          ->pluck('marks_obtained');
+                          
+            $classAverages[$ct->id] = $marks->count() > 0 ? round($marks->avg(), 2) : '-';
+        }
+
+        // For now, return view (we'll add PDF generation later)
+        return view('courses.ct-marks-pdf', compact('course', 'ctSchedules', 'students', 'marksData', 'classAverages'));
     }
 }

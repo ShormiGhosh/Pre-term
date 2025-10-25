@@ -57,6 +57,10 @@ Route::middleware(['teacher.auth'])->group(function () {
     Route::delete('/ct-schedules/{id}', [\App\Http\Controllers\CTScheduleController::class, 'destroy'])->name('ct-schedules.destroy');
     Route::post('/ct-schedules/{id}/mark-past', [\App\Http\Controllers\CTScheduleController::class, 'markAsPast'])->name('ct-schedules.mark-past');
     
+    // CT Marks routes for teachers
+    Route::post('/courses/{courseId}/ct-marks/save', [\App\Http\Controllers\CTScheduleController::class, 'saveMarks'])->name('ct-marks.save');
+    Route::get('/courses/{courseId}/ct-marks/download', [\App\Http\Controllers\CTScheduleController::class, 'downloadMarks'])->name('ct-marks.download');
+    
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });
 

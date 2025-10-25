@@ -349,20 +349,7 @@
             </div>
         </div>
 
-        <!-- CT Marks Section -->
-        <div class="placeholder-content" id="section-ct-marks">
-            <div class="content-header">
-                <h1 class="content-title">CT Marks</h1>
-                <p class="content-subtitle">{{ $course->course_code }} - {{ $course->course_title }}</p>
-            </div>
-
-            <div class="content-section">
-                <div class="empty-state">
-                    <div class="empty-state-icon"></div>
-                    <p class="empty-state-text">CT marks will be displayed here</p>
-                </div>
-            </div>
-        </div>
+        @include('courses.ct-marks-section')
 
         <!-- CT Schedule Section -->
         <div class="placeholder-content" id="section-ct-schedule">
@@ -829,31 +816,42 @@ const sections = document.querySelectorAll('.placeholder-content');
 console.log('Menu items found:', menuItems.length);
 console.log('Sections found:', sections.length);
 
+// Function to activate a section
+function activateSection(sectionName) {
+    // Remove active class from all items
+    menuItems.forEach(mi => mi.classList.remove('active'));
+    
+    // Hide all sections
+    sections.forEach(section => section.classList.remove('active'));
+    
+    // Find and activate the menu item and section
+    const menuItem = document.querySelector(`.sidebar-menu-item[data-section="${sectionName}"]`);
+    const targetSection = document.getElementById('section-' + sectionName);
+    
+    if (menuItem && targetSection) {
+        menuItem.classList.add('active');
+        targetSection.classList.add('active');
+        console.log('Section activated:', sectionName);
+    }
+}
+
+// Restore last active tab from localStorage
+const courseId = {{ $course->id }};
+const lastActiveTab = localStorage.getItem(`course_${courseId}_activeTab`);
+if (lastActiveTab) {
+    activateSection(lastActiveTab);
+}
+
 menuItems.forEach(item => {
     item.addEventListener('click', function() {
-        console.log('Clicked on:', this.getAttribute('data-section'));
+        const sectionName = this.getAttribute('data-section');
+        console.log('Clicked on:', sectionName);
         
-        // Remove active class from all items
-        menuItems.forEach(mi => mi.classList.remove('active'));
+        // Activate the section
+        activateSection(sectionName);
         
-        // Add active class to clicked item
-        this.classList.add('active');
-        
-        // Hide all sections
-        sections.forEach(section => section.classList.remove('active'));
-        
-        // Show selected section
-        const sectionId = 'section-' + this.getAttribute('data-section');
-        const targetSection = document.getElementById(sectionId);
-        
-        console.log('Looking for section:', sectionId);
-        
-        if (targetSection) {
-            targetSection.classList.add('active');
-            console.log('Section activated:', sectionId);
-        } else {
-            console.error('Section not found:', sectionId);
-        }
+        // Save to localStorage
+        localStorage.setItem(`course_${courseId}_activeTab`, sectionName);
     });
 });
 

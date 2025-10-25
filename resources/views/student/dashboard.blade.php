@@ -50,7 +50,7 @@
     .notification-bell-btn {
         position: fixed;
         top: 5rem;
-        right: 13rem;
+        right: 15.5rem;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -64,7 +64,6 @@
         cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
         z-index: 100;
-        position: relative;
     }
 
     .notification-bell-btn:hover {
@@ -89,7 +88,7 @@
     .notification-dropdown {
         position: fixed;
         top: 9rem;
-        right: 13rem;
+        right: 15.5rem;
         width: 400px;
         max-height: 500px;
         background: #1c1a36;

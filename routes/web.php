@@ -55,6 +55,7 @@ Route::middleware(['teacher.auth'])->group(function () {
     // CT Schedule routes for teachers
     Route::post('/courses/{courseId}/ct-schedules', [\App\Http\Controllers\CTScheduleController::class, 'store'])->name('ct-schedules.store');
     Route::delete('/ct-schedules/{id}', [\App\Http\Controllers\CTScheduleController::class, 'destroy'])->name('ct-schedules.destroy');
+    Route::post('/ct-schedules/{id}/mark-past', [\App\Http\Controllers\CTScheduleController::class, 'markAsPast'])->name('ct-schedules.mark-past');
     
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });
@@ -94,6 +95,9 @@ Route::middleware(['student.auth'])->group(function () {
     Route::post('/courses/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
     Route::delete('/courses/{id}/unenroll', [CourseController::class, 'unenroll'])->name('courses.unenroll');
     Route::get('/student/courses/{id}', [CourseController::class, 'show'])->name('student.courses.show');
+    
+    // AJAX: Mark CT as past (auto-update when countdown expires)
+    Route::post('/ct-schedules/{id}/mark-past', [\App\Http\Controllers\CTScheduleController::class, 'markAsPast'])->name('ct-schedules.mark-past');
     
     Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 });

@@ -66,4 +66,16 @@ class CTScheduleController extends Controller
 
         return redirect()->back()->with('success', 'CT schedule deleted successfully!');
     }
+
+    public function markAsPast($id)
+    {
+        $ctSchedule = CTSchedule::findOrFail($id);
+        
+        // Return success - the CT will automatically be in past section
+        // since the frontend checks ct_datetime vs current time
+        return response()->json([
+            'success' => true,
+            'message' => 'CT marked as past'
+        ]);
+    }
 }

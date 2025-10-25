@@ -148,7 +148,7 @@
         @endif
 
         <div class="alert">
-            <p><strong>⏰ Reminder:</strong> Make sure to prepare well for this CT. Good luck!</p>
+            <p><strong>Reminder:</strong> Make sure to prepare well for this CT. Good luck!</p>
         </div>
 
         <div class="footer">

@@ -246,6 +246,17 @@
             left: 0;
         }
     }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
 </style>
 
 <div class="course-detail-container">
@@ -332,7 +343,7 @@
 
             <div class="content-section">
                 <div class="empty-state">
-                    <div class="empty-state-icon">📋</div>
+                    <div class="empty-state-icon"></div>
                     <p class="empty-state-text">Attendance tracking will be available here</p>
                 </div>
             </div>
@@ -347,7 +358,7 @@
 
             <div class="content-section">
                 <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-icon"></div>
                     <p class="empty-state-text">CT marks will be displayed here</p>
                 </div>
             </div>
@@ -400,7 +411,7 @@
             @endif
 
             <!-- Scheduled CTs List -->
-            <div class="content-section">
+            <div class="content-section" id="scheduled-cts-section">
                 <h2 class="section-title">Scheduled CTs</h2>
 
                 @php
@@ -411,9 +422,9 @@
                 @if($upcomingCTs->count() > 0)
                 <div style="margin-bottom: 2rem;">
                     <h3 style="color: #F1F5FB; font-size: 1.25rem; margin-bottom: 1rem;">Upcoming CTs</h3>
-                    <div class="ct-cards-grid">
+                    <div class="ct-cards-grid" id="upcoming-cts">
                         @foreach($upcomingCTs as $ct)
-                        <div class="ct-card upcoming-ct" data-ct-timestamp="{{ $ct->ct_datetime->timestamp * 1000 }}">
+                        <div class="ct-card upcoming-ct" data-ct-timestamp="{{ $ct->ct_datetime->timestamp * 1000 }}" data-ct-id="{{ $ct->id }}">
                             <div class="ct-card-header">
                                 <div>
                                     <h3 class="ct-name">{{ $ct->ct_name }}</h3>
@@ -470,6 +481,13 @@
                                         </div>
                                     </div>
                                 </div>
+                                @else
+                                <!-- Status badge for Teachers -->
+                                <div class="countdown-timer" id="countdown-{{ $ct->id }}">
+                                    <div style="text-align: center; padding: 0.75rem; background: rgba(59, 130, 246, 0.15); border: 2px solid rgba(59, 130, 246, 0.4); border-radius: 8px;">
+                                        <span style="color: #93c5fd; font-weight: 700; font-size: 1rem;">⏰ Scheduled</span>
+                                    </div>
+                                </div>
                                 @endif
                             </div>
                         </div>
@@ -481,7 +499,7 @@
                 @if($pastCTs->count() > 0)
                 <div>
                     <h3 style="color: #F1F5FB; font-size: 1.25rem; margin-bottom: 1rem;">Past CTs</h3>
-                    <div class="ct-cards-grid">
+                    <div class="ct-cards-grid" id="past-cts">
                         @foreach($pastCTs as $ct)
                         <div class="ct-card past-ct">
                             <div class="ct-card-header">
@@ -858,19 +876,19 @@ menuItems.forEach(item => {
             const diff = ctDatetime - now;
             
             if (diff <= 0) {
-                // Countdown finished, hide timer and show message
+                // Countdown finished, show completed badge
                 const countdown = card.querySelector('.countdown-timer');
                 if (countdown) {
-                    countdown.innerHTML = '<div style="text-align: center; padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;"><span style="color: #fca5a5; font-weight: 600;">⏰ CT Time Reached!</span></div>';
+                    countdown.innerHTML = '<div style="text-align: center; padding: 0.75rem; background: rgba(34, 197, 94, 0.15); border: 2px solid rgba(34, 197, 94, 0.4); border-radius: 8px;"><span style="color: #86efac; font-weight: 700; font-size: 1rem;">✓ Completed</span></div>';
                 }
                 
-                // Check every 30 seconds if we should reload (when actual time passes)
-                const actualTimestamp = parseInt(ctTimestamp);
-                const actualDiff = actualTimestamp - now.getTime();
-                if (actualDiff <= 0) {
-                    // Actual time has passed, reload to move to Past CTs
-                    location.reload();
+                // Mark card as completed (for both teacher and student)
+                if (!card.classList.contains('ct-completed')) {
+                    card.classList.add('ct-completed');
+                    card.style.opacity = '0.7';
+                    card.style.border = '2px solid rgba(34, 197, 94, 0.3)';
                 }
+                
                 return;
             }
             

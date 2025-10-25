@@ -65,7 +65,6 @@ Route::middleware(['teacher.auth'])->group(function () {
     Route::post('/courses/{courseId}/attendance/generate-qr', [\App\Http\Controllers\AttendanceController::class, 'generateQR'])->name('attendance.generate-qr');
     Route::get('/attendance/session/{sessionId}/status', [\App\Http\Controllers\AttendanceController::class, 'getSessionStatus'])->name('attendance.session.status');
     Route::post('/attendance/session/{sessionId}/close', [\App\Http\Controllers\AttendanceController::class, 'closeSession'])->name('attendance.session.close');
-    Route::get('/courses/{courseId}/attendance/active', [\App\Http\Controllers\AttendanceController::class, 'getActiveSession'])->name('teacher.attendance.active');
     
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });
@@ -108,7 +107,6 @@ Route::middleware(['student.auth'])->group(function () {
     
     // Attendance routes for students
     Route::post('/attendance/mark', [\App\Http\Controllers\AttendanceController::class, 'markAttendance'])->name('attendance.mark');
-    Route::get('/courses/{courseId}/attendance/active', [\App\Http\Controllers\AttendanceController::class, 'getActiveSession'])->name('attendance.active');
     Route::get('/courses/{courseId}/attendance/data', [\App\Http\Controllers\AttendanceController::class, 'getStudentAttendance'])->name('attendance.student.data');
     
     // AJAX: Mark CT as past (auto-update when countdown expires)
@@ -116,3 +114,8 @@ Route::middleware(['student.auth'])->group(function () {
     
     Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 });
+
+// Shared routes accessible by both teachers and students
+Route::get('/courses/{courseId}/attendance/active', [\App\Http\Controllers\AttendanceController::class, 'getActiveSession'])
+    ->middleware(['auth:teacher,student'])
+    ->name('attendance.active');

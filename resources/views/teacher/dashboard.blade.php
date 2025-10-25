@@ -24,10 +24,14 @@
     }
 
     .add-course-btn {
+        position: fixed;
+        top: 5rem;
+        right: 1.5rem;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
         padding: 0.875rem 1.5rem;
+        z-index: 100;
         background: linear-gradient(135deg, #401a75, #5e2a9e);
         color: #F1F5FB;
         border: none;
@@ -317,17 +321,17 @@
         <div class="alert alert-danger" id="errorAlert">{{ session('error') }}</div>
     @endif
 
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">My Courses</h1>
-        <button class="add-course-btn" onclick="openAddCourseModal()">
-            <span style="font-size: 1.5rem; line-height: 1;">+</span>
-            Add Course
-        </button>
-    </div>
+    <!-- Add Course Button - Top Right Corner -->
+    <button class="add-course-btn" onclick="openAddCourseModal()">
+        <span style="font-size: 1.5rem; line-height: 1;">+</span>
+        Add Course
+    </button>
+
+    <h1 class="dashboard-title" style="margin-bottom: 2rem;">My Courses</h1>
 
     <div class="courses-grid">
         @forelse(auth()->guard('teacher')->user()->courses as $course)
-            <div class="course-card" onclick="window.location.href='{{ route('courses.show', $course->id) }}'" style="background: linear-gradient(135deg, 
+            <div class="course-card" onclick="window.location.href='{{ route('teacher.courses.show', $course->id) }}'" style="background: linear-gradient(135deg, 
                 @if(str_contains($course->course_code, 'CSE') || str_contains($course->course_code, 'EEE'))
                     rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1)
                 @elseif(str_contains($course->course_code, 'ME') || str_contains($course->course_code, 'IPE'))

@@ -50,7 +50,11 @@ Route::middleware(['teacher.auth'])->group(function () {
     // Course management routes for teachers
     Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
     Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
-    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/teacher/courses/{id}', [CourseController::class, 'show'])->name('teacher.courses.show');
+    
+    // CT Schedule routes for teachers
+    Route::post('/courses/{courseId}/ct-schedules', [\App\Http\Controllers\CTScheduleController::class, 'store'])->name('ct-schedules.store');
+    Route::delete('/ct-schedules/{id}', [\App\Http\Controllers\CTScheduleController::class, 'destroy'])->name('ct-schedules.destroy');
     
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });
@@ -89,7 +93,7 @@ Route::middleware(['student.auth'])->group(function () {
     // Course enrollment routes for students
     Route::post('/courses/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
     Route::delete('/courses/{id}/unenroll', [CourseController::class, 'unenroll'])->name('courses.unenroll');
-    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/student/courses/{id}', [CourseController::class, 'show'])->name('student.courses.show');
     
     Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 });

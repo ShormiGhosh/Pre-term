@@ -37,4 +37,12 @@ class Course extends Model
     {
         return $this->hasMany(CourseEnrollment::class);
     }
+
+    /**
+     * Get all CT schedules for this course
+     */
+    public function ctSchedules()
+    {
+        return $this->hasMany(CTSchedule::class);
+    }
 }

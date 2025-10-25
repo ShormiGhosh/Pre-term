@@ -76,9 +76,7 @@
     }
 
     .sidebar-menu-icon {
-        font-size: 1.25rem;
-        width: 24px;
-        text-align: center;
+        display: none;
     }
 
     .sidebar-menu-text {
@@ -164,7 +162,7 @@
     }
 
     .section-icon {
-        font-size: 1.75rem;
+        display: none;
     }
 
     .info-grid {
@@ -211,9 +209,7 @@
     }
 
     .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.3;
+        display: none;
     }
 
     .empty-state-text {
@@ -357,15 +353,411 @@
                 <p class="content-subtitle">{{ $course->course_code }} - {{ $course->course_title }}</p>
             </div>
 
+            @if($user instanceof \App\Models\Teacher && $user->id === $course->teacher_id)
+            <!-- Teacher View: Add CT Schedule Form -->
+            <div class="content-section" style="margin-bottom: 2rem;">
+                <h2 class="section-title">Schedule New CT</h2>
+                <form action="{{ route('ct-schedules.store', $course->id) }}" method="POST" class="ct-form">
+                    @csrf
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="ct_name">CT Name *</label>
+                            <input type="text" id="ct_name" name="ct_name" required 
+                                   placeholder="e.g., CT 1, CT 2, Midterm" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ct_datetime">Date & Time *</label>
+                            <input type="datetime-local" id="ct_datetime" name="ct_datetime" 
+                                   required class="form-input" min="{{ now()->format('Y-m-d\TH:i') }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="total_marks">Total Marks *</label>
+                            <input type="number" id="total_marks" name="total_marks" 
+                                   required min="1" placeholder="e.g., 20" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description (Optional)</label>
+                        <textarea id="description" name="description" rows="3" 
+                                  placeholder="Additional information about the CT..." class="form-input"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        Schedule CT & Notify Students
+                    </button>
+                </form>
+            </div>
+            @endif
+
+            <!-- Scheduled CTs List -->
             <div class="content-section">
-                <div class="empty-state">
-                    <div class="empty-state-icon">📅</div>
-                    <p class="empty-state-text">CT schedule will be shown here</p>
+                <h2 class="section-title">Scheduled CTs</h2>
+
+                @php
+                    $upcomingCTs = $course->ctSchedules()->where('ct_datetime', '>', now())->orderBy('ct_datetime', 'asc')->get();
+                    $pastCTs = $course->ctSchedules()->where('ct_datetime', '<=', now())->orderBy('ct_datetime', 'desc')->get();
+                @endphp
+
+                @if($upcomingCTs->count() > 0)
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: #F1F5FB; font-size: 1.25rem; margin-bottom: 1rem;">Upcoming CTs</h3>
+                    <div class="ct-cards-grid">
+                        @foreach($upcomingCTs as $ct)
+                        <div class="ct-card upcoming-ct" data-ct-datetime="{{ $ct->ct_datetime->toIso8601String() }}">
+                            <div class="ct-card-header">
+                                <div>
+                                    <h3 class="ct-name">{{ $ct->ct_name }}</h3>
+                                    <div class="ct-datetime">
+                                        {{ $ct->ct_datetime->format('l, F j, Y') }}<br>
+                                        {{ $ct->ct_datetime->format('g:i A') }}
+                                    </div>
+                                </div>
+                                @if($user instanceof \App\Models\Teacher && $user->id === $course->teacher_id)
+                                <form action="{{ route('ct-schedules.destroy', $ct->id) }}" method="POST" style="margin: 0;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-delete" 
+                                            onclick="return confirm('Are you sure you want to delete this CT schedule?')">
+                                        Delete
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
+                            
+                            <div class="ct-card-body">
+                                <div class="ct-info-row">
+                                    <span class="ct-label">Total Marks:</span>
+                                    <span class="ct-value">{{ $ct->total_marks }}</span>
+                                </div>
+                                
+                                @if($ct->description)
+                                <div class="ct-description">
+                                    <strong>Description:</strong>
+                                    <p>{{ $ct->description }}</p>
+                                </div>
+                                @endif
+                                
+                                <!-- Countdown Timer for Students -->
+                                @if($user instanceof \App\Models\Student)
+                                <div class="countdown-timer" id="countdown-{{ $ct->id }}">
+                                    <div class="countdown-label">Time Remaining:</div>
+                                    <div class="countdown-display">
+                                        <div class="countdown-part">
+                                            <span class="countdown-number days">00</span>
+                                            <span class="countdown-text">Days</span>
+                                        </div>
+                                        <div class="countdown-part">
+                                            <span class="countdown-number hours">00</span>
+                                            <span class="countdown-text">Hours</span>
+                                        </div>
+                                        <div class="countdown-part">
+                                            <span class="countdown-number minutes">00</span>
+                                            <span class="countdown-text">Minutes</span>
+                                        </div>
+                                        <div class="countdown-part">
+                                            <span class="countdown-number seconds">00</span>
+                                            <span class="countdown-text">Seconds</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
+                @endif
+
+                @if($pastCTs->count() > 0)
+                <div>
+                    <h3 style="color: #F1F5FB; font-size: 1.25rem; margin-bottom: 1rem;">Past CTs</h3>
+                    <div class="ct-cards-grid">
+                        @foreach($pastCTs as $ct)
+                        <div class="ct-card past-ct">
+                            <div class="ct-card-header">
+                                <div>
+                                    <h3 class="ct-name">{{ $ct->ct_name }}</h3>
+                                    <div class="ct-datetime">
+                                        {{ $ct->ct_datetime->format('l, F j, Y') }}<br>
+                                        {{ $ct->ct_datetime->format('g:i A') }}
+                                    </div>
+                                </div>
+                                @if($user instanceof \App\Models\Teacher && $user->id === $course->teacher_id)
+                                <form action="{{ route('ct-schedules.destroy', $ct->id) }}" method="POST" style="margin: 0;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-delete" 
+                                            onclick="return confirm('Are you sure you want to delete this CT schedule?')">
+                                        Delete
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
+                            
+                            <div class="ct-card-body">
+                                <div class="ct-info-row">
+                                    <span class="ct-label">Total Marks:</span>
+                                    <span class="ct-value">{{ $ct->total_marks }}</span>
+                                </div>
+                                
+                                @if($ct->description)
+                                <div class="ct-description">
+                                    <strong>Description:</strong>
+                                    <p>{{ $ct->description }}</p>
+                                </div>
+                                @endif
+                                
+                                <div class="status-badge completed">
+                                    Completed
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                @if($upcomingCTs->count() === 0 && $pastCTs->count() === 0)
+                <div class="empty-state">
+                    <p class="empty-state-text">No CT schedules yet</p>
+                </div>
+                @endif
             </div>
         </div>
     </main>
 </div>
+
+<style>
+    /* CT Schedule Styles */
+    .ct-form {
+        margin-top: 1.5rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: #F1F5FB;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: rgba(193, 206, 229, 0.1);
+        border: 1px solid rgba(193, 206, 229, 0.2);
+        border-radius: 8px;
+        color: #F1F5FB;
+        font-size: 0.9375rem;
+        transition: all 0.3s;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #401a75;
+        background: rgba(193, 206, 229, 0.15);
+    }
+
+    .form-input::placeholder {
+        color: #8894AC;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #401a75, #5e2a9e);
+        color: #F1F5FB;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(64, 26, 117, 0.4);
+    }
+
+    .ct-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .ct-card {
+        background: linear-gradient(135deg, rgba(38, 41, 54, 0.6), rgba(64, 26, 117, 0.3));
+        border: 1px solid rgba(193, 206, 229, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s;
+    }
+
+    .ct-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .upcoming-ct {
+        border-left: 4px solid #10b981;
+    }
+
+    .past-ct {
+        opacity: 0.7;
+        border-left: 4px solid #6b7280;
+    }
+
+    .ct-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(193, 206, 229, 0.1);
+    }
+
+    .ct-name {
+        color: #F1F5FB;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .ct-datetime {
+        color: #8894AC;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        color: #fca5a5;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.3s;
+    }
+
+    .btn-delete:hover {
+        background: rgba(239, 68, 68, 0.3);
+    }
+
+    .ct-card-body {
+        color: #C1CEE5;
+    }
+
+    .ct-info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+
+    .ct-label {
+        color: #8894AC;
+        font-size: 0.875rem;
+    }
+
+    .ct-value {
+        color: #F1F5FB;
+        font-weight: 600;
+    }
+
+    .ct-description {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(193, 206, 229, 0.05);
+        border-radius: 8px;
+        border-left: 3px solid #401a75;
+    }
+
+    .ct-description strong {
+        color: #F1F5FB;
+        font-size: 0.875rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .ct-description p {
+        color: #C1CEE5;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .countdown-timer {
+        margin-top: 1.5rem;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 10px;
+    }
+
+    .countdown-label {
+        color: #10b981;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+    }
+
+    .countdown-display {
+        display: flex;
+        justify-content: space-around;
+        gap: 0.5rem;
+    }
+
+    .countdown-part {
+        text-align: center;
+        flex: 1;
+    }
+
+    .countdown-number {
+        display: block;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #10b981;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .countdown-text {
+        display: block;
+        font-size: 0.75rem;
+        color: #8894AC;
+        text-transform: uppercase;
+    }
+
+    .status-badge {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .status-badge.completed {
+        background: rgba(107, 114, 128, 0.2);
+        color: #9ca3af;
+        border: 1px solid rgba(107, 114, 128, 0.3);
+    }
+</style>
 
 <script>
 // Sidebar Toggle
@@ -406,5 +798,52 @@ menuItems.forEach(item => {
         document.getElementById(sectionId).classList.add('active');
     });
 });
+
+// Countdown Timer for CTs
+function updateCountdowns() {
+    const ctCards = document.querySelectorAll('.upcoming-ct');
+    
+    ctCards.forEach(card => {
+        const ctDatetimeStr = card.getAttribute('data-ct-datetime');
+        if (!ctDatetimeStr) return;
+        
+        const ctDatetime = new Date(ctDatetimeStr);
+        const now = new Date();
+        const diff = ctDatetime - now;
+        
+        if (diff <= 0) {
+            // CT has passed, reload page to update status
+            location.reload();
+            return;
+        }
+        
+        // Calculate time units
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        // Find countdown element within this card
+        const countdown = card.querySelector('.countdown-timer');
+        if (countdown) {
+            const daysEl = countdown.querySelector('.days');
+            const hoursEl = countdown.querySelector('.hours');
+            const minutesEl = countdown.querySelector('.minutes');
+            const secondsEl = countdown.querySelector('.seconds');
+            
+            if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+            if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+            if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+            if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+    });
+}
+
+// Initialize countdowns
+if (document.querySelectorAll('.upcoming-ct').length > 0) {
+    updateCountdowns();
+    // Update countdowns every second
+    setInterval(updateCountdowns, 1000);
+}
 </script>
 @endsection

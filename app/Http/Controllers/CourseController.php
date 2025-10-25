@@ -32,7 +32,9 @@ class CourseController extends Controller
      */
     public function show($id)
     {
-        $course = Course::with('teacher', 'students')->findOrFail($id);
+        $course = Course::with(['teacher', 'students', 'ctSchedules' => function($query) {
+            $query->orderBy('ct_datetime', 'asc');
+        }])->findOrFail($id);
         
         // Check if user has access to this course
         $user = Auth::guard('teacher')->check() ? Auth::guard('teacher')->user() : Auth::guard('student')->user();

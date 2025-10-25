@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\AttendanceSession;
 use App\Models\Course;
+use App\Mail\LowAttendanceNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -191,9 +193,33 @@ class AttendanceController extends Controller
             ];
         });
 
+        // Calculate attendance based on unique days (not individual sessions)
+        $sessionsByDate = $sessions->groupBy(function($session) {
+            return $session->started_at->format('Y-m-d');
+        });
+
+        $totalDays = $sessionsByDate->count();
+        $presentDays = 0;
+
+        foreach ($sessionsByDate as $date => $dateSessions) {
+            // Check if student was present in ANY session on this date
+            $wasPresentOnDate = $dateSessions->filter(function($session) use ($student) {
+                return $session->attendances->where('student_id', $student->id)
+                    ->where('status', 'present')
+                    ->count() > 0;
+            })->count() > 0;
+
+            if ($wasPresentOnDate) {
+                $presentDays++;
+            }
+        }
+
         return response()->json([
             'success' => true,
             'attendances' => $attendanceData,
+            'total_days' => $totalDays,
+            'present_days' => $presentDays,
+            'percentage' => $totalDays > 0 ? round(($presentDays / $totalDays) * 100, 2) : 0,
         ]);
     }
 
@@ -272,9 +298,236 @@ class AttendanceController extends Controller
 
         $session->update(['is_active' => false]);
 
+        // Check for low attendance and send notifications
+        $this->checkAndNotifyLowAttendance($session->course_id);
+
         return response()->json([
             'success' => true,
             'message' => 'Attendance session closed.'
+        ]);
+    }
+
+    /**
+     * Check students with low attendance and send email notifications
+     */
+    private function checkAndNotifyLowAttendance($courseId)
+    {
+        $threshold = 60; // 60% attendance threshold
+        $course = Course::findOrFail($courseId);
+        
+        // Get all students enrolled in this course
+        $students = $course->students;
+        
+        // Get total closed attendance sessions for this course
+        $totalSessions = AttendanceSession::where('course_id', $courseId)
+            ->where('is_active', false)
+            ->count();
+        
+        if ($totalSessions == 0) {
+            return;
+        }
+
+        foreach ($students as $student) {
+            // Count present attendances for this student
+            $presentCount = Attendance::whereHas('attendanceSession', function($query) use ($courseId) {
+                    $query->where('course_id', $courseId)
+                          ->where('is_active', false);
+                })
+                ->where('student_id', $student->id)
+                ->where('status', 'present')
+                ->count();
+            
+            // Calculate attendance rate
+            $attendanceRate = $totalSessions > 0 
+                ? ($presentCount / $totalSessions) * 100 
+                : 0;
+            
+            // Send notification if below threshold
+            if ($attendanceRate < $threshold) {
+                try {
+                    Mail::to($student->email)->send(
+                        new LowAttendanceNotification(
+                            $student->name,
+                            $course,
+                            $attendanceRate,
+                            $presentCount,
+                            $totalSessions
+                        )
+                    );
+                } catch (\Exception $e) {
+                    // Log error but don't fail the request
+                    \Log::error("Failed to send low attendance email to {$student->email}: " . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Get attendance sheet data for manual attendance view (teacher)
+     */
+    public function getAttendanceSheet($courseId)
+    {
+        $teacher = Auth::guard('teacher')->user();
+        $course = Course::with('teacher')->findOrFail($courseId);
+
+        // Verify teacher owns this course
+        if ($course->teacher_id !== $teacher->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access.'
+            ], 403);
+        }
+
+        // Get all enrolled students
+        $students = $course->students()->orderBy('roll_number')->get();
+
+        // Get all closed attendance sessions with dates (group by date)
+        $sessions = AttendanceSession::where('course_id', $courseId)
+            ->where('is_active', false)
+            ->orderBy('started_at')
+            ->get()
+            ->groupBy(function($session) {
+                return $session->started_at->format('Y-m-d');
+            });
+
+        $attendanceDates = $sessions->keys()->toArray();
+
+        // Build attendance data for each student
+        $attendanceData = [];
+        foreach ($students as $student) {
+            $studentData = [
+                'student_id' => $student->id,
+                'roll' => $student->roll_number,
+                'name' => $student->name,
+                'attendance' => [],
+                'total_sessions' => count($attendanceDates),
+                'present_count' => 0,
+                'percentage' => 0,
+                'marks' => 0,
+            ];
+
+            // Get attendance for each date
+            foreach ($attendanceDates as $date) {
+                $sessionIds = $sessions[$date]->pluck('id')->toArray();
+                
+                // Check if student was present on this date (any session on that date)
+                $attendance = Attendance::whereIn('attendance_session_id', $sessionIds)
+                    ->where('student_id', $student->id)
+                    ->where('status', 'present')
+                    ->first();
+
+                $studentData['attendance'][$date] = $attendance ? 'P' : 'A';
+                
+                if ($attendance) {
+                    $studentData['present_count']++;
+                }
+            }
+
+            // Calculate percentage
+            if ($studentData['total_sessions'] > 0) {
+                $studentData['percentage'] = round(($studentData['present_count'] / $studentData['total_sessions']) * 100, 2);
+            }
+
+            // Get calculated marks if exists
+            $latestAttendance = Attendance::where('student_id', $student->id)
+                ->where('course_id', $courseId)
+                ->whereNotNull('marks')
+                ->orderBy('updated_at', 'desc')
+                ->first();
+            
+            if ($latestAttendance) {
+                $studentData['marks'] = $latestAttendance->marks;
+            }
+
+            $attendanceData[] = $studentData;
+        }
+
+        return response()->json([
+            'success' => true,
+            'dates' => $attendanceDates,
+            'students' => $attendanceData,
+            'total_marks' => $course->attendance_total_marks ?? 10,
+        ]);
+    }
+
+    /**
+     * Calculate and save attendance marks based on percentage
+     */
+    public function calculateAttendanceMarks($courseId)
+    {
+        $teacher = Auth::guard('teacher')->user();
+        $course = Course::findOrFail($courseId);
+
+        // Verify teacher owns this course
+        if ($course->teacher_id !== $teacher->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access.'
+            ], 403);
+        }
+
+        $totalMarks = $course->attendance_total_marks ?? 10;
+        $students = $course->students;
+
+        // Get total closed sessions
+        $totalSessions = AttendanceSession::where('course_id', $courseId)
+            ->where('is_active', false)
+            ->get()
+            ->groupBy(function($session) {
+                return $session->started_at->format('Y-m-d');
+            })
+            ->count();
+
+        if ($totalSessions == 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No attendance sessions found.'
+            ], 400);
+        }
+
+        foreach ($students as $student) {
+            // Count unique dates present
+            $sessionIds = AttendanceSession::where('course_id', $courseId)
+                ->where('is_active', false)
+                ->pluck('id');
+
+            $presentCount = Attendance::whereIn('attendance_session_id', $sessionIds)
+                ->where('student_id', $student->id)
+                ->where('status', 'present')
+                ->get()
+                ->groupBy(function($attendance) {
+                    return $attendance->attendanceSession->started_at->format('Y-m-d');
+                })
+                ->count();
+
+            // Calculate percentage
+            $percentage = $totalSessions > 0 ? ($presentCount / $totalSessions) * 100 : 0;
+
+            // Calculate marks based on attendance percentage with fixed grading scheme
+            $marks = 0;
+            if ($percentage >= 90) {
+                $marks = 5;
+            } elseif ($percentage >= 80) {
+                $marks = 4;
+            } elseif ($percentage >= 70) {
+                $marks = 3;
+            } elseif ($percentage >= 65) {
+                $marks = 2;
+            } elseif ($percentage >= 60) {
+                $marks = 1;
+            } else {
+                $marks = 0;
+            }
+
+            // Update marks in all attendance records for this student in this course
+            Attendance::where('student_id', $student->id)
+                ->where('course_id', $courseId)
+                ->update(['marks' => $marks]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attendance marks calculated and saved successfully!'
         ]);
     }
 }

@@ -12,6 +12,7 @@ class Course extends Model
         'course_credit',
         'teacher_id',
         'department',
+        'attendance_total_marks',
     ];
 
     /**

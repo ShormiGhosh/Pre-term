@@ -65,6 +65,8 @@ Route::middleware(['teacher.auth'])->group(function () {
     Route::post('/courses/{courseId}/attendance/generate-qr', [\App\Http\Controllers\AttendanceController::class, 'generateQR'])->name('attendance.generate-qr');
     Route::get('/attendance/session/{sessionId}/status', [\App\Http\Controllers\AttendanceController::class, 'getSessionStatus'])->name('attendance.session.status');
     Route::post('/attendance/session/{sessionId}/close', [\App\Http\Controllers\AttendanceController::class, 'closeSession'])->name('attendance.session.close');
+    Route::get('/courses/{courseId}/attendance/sheet', [\App\Http\Controllers\AttendanceController::class, 'getAttendanceSheet'])->name('attendance.sheet');
+    Route::post('/courses/{courseId}/attendance/calculate-marks', [\App\Http\Controllers\AttendanceController::class, 'calculateAttendanceMarks'])->name('attendance.calculate-marks');
     
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });

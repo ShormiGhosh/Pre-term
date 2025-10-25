@@ -12,6 +12,7 @@ class Attendance extends Model
         'course_id',
         'status',
         'marked_at',
+        'marks',
     ];
 
     protected $casts = [

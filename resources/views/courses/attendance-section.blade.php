@@ -70,7 +70,6 @@ console.log('Auth guard check - Student:', {{ Auth::guard('student')->check() ? 
             <thead>
                 <tr>
                     <th>Date</th>
-                    <th>Time</th>
                     <th>Present</th>
                     <th>Absent</th>
                     <th>Attendance Rate</th>
@@ -84,7 +83,6 @@ console.log('Auth guard check - Student:', {{ Auth::guard('student')->check() ? 
                 @forelse($sessions as $session)
                 <tr>
                     <td>{{ $session->started_at->format('M d, Y') }}</td>
-                    <td>{{ $session->started_at->format('h:i A') }}</td>
                     <td class="present-count">{{ $session->present_count }}</td>
                     <td class="absent-count">{{ $session->total_students - $session->present_count }}</td>
                     <td>
@@ -107,11 +105,39 @@ console.log('Auth guard check - Student:', {{ Auth::guard('student')->check() ? 
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="empty-row">No attendance sessions yet</td>
+                    <td colspan="5" class="empty-row">No attendance sessions yet</td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
+    </div>
+</div>
+
+{{-- Manual Attendance Sheet View --}}
+<div class="manual-attendance-section">
+    <h2>Attendance Sheet</h2>
+    <p class="subtitle">View and manage student attendance marks</p>
+    
+    <div class="attendance-table-container" id="attendanceTableContainer">
+        <div class="loading-spinner" id="attendanceLoader">Loading attendance data...</div>
+        <div id="attendanceTableWrapper" style="display: none;">
+            <div class="table-header-actions">
+                <button id="calculateMarksBtn" class="btn-primary">
+                    <span class="material-symbols-outlined">calculate</span>
+                    Calculate Marks
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="attendance-sheet-table" id="attendanceSheetTable">
+                    <thead id="attendanceTableHead">
+                        <!-- Will be populated dynamically -->
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <!-- Will be populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -176,6 +202,13 @@ console.log('Auth guard check - Student:', {{ Auth::guard('student')->check() ? 
             <div class="summary-info">
                 <h4>Attendance Rate</h4>
                 <p class="summary-value" id="attendanceRate">0%</p>
+            </div>
+        </div>
+        <div class="summary-card">
+            <span class="material-symbols-outlined card-icon-marks">grade</span>
+            <div class="summary-info">
+                <h4>Attendance Marks</h4>
+                <p class="summary-value" id="attendanceMarks">0</p>
             </div>
         </div>
     </div>
@@ -572,6 +605,146 @@ console.log('Auth guard check - Student:', {{ Auth::guard('student')->check() ? 
     margin: 0;
 }
 
+/* Manual Attendance Sheet Styles */
+.manual-attendance-section {
+    margin-top: 3rem;
+    background: rgba(38, 41, 54, 0.5);
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+.manual-attendance-section h2 {
+    color: #F1F5FB;
+    margin: 0 0 0.5rem 0;
+}
+
+.manual-attendance-section .subtitle {
+    color: #C1CEE5;
+    margin: 0 0 1.5rem 0;
+}
+
+.attendance-table-container {
+    background: rgba(20, 23, 32, 0.6);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 3rem;
+    color: #C1CEE5;
+    font-size: 1.1rem;
+}
+
+.table-header-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(193, 206, 229, 0.1);
+}
+
+.table-header-actions .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.table-header-actions .btn-primary .material-symbols-outlined {
+    font-size: 1.2rem;
+}
+
+.total-marks-display {
+    color: #C1CEE5;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.total-marks-display span {
+    color: #7c3aed;
+    font-size: 1.3rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.attendance-sheet-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(38, 41, 54, 0.3);
+    border-radius: 8px;
+}
+
+.attendance-sheet-table thead {
+    background: linear-gradient(135deg, #7c3aed 0%, #401a75 100%);
+}
+
+.attendance-sheet-table th {
+    padding: 1rem;
+    text-align: left;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.attendance-sheet-table th.date-column {
+    text-align: center;
+    min-width: 80px;
+}
+
+.attendance-sheet-table tbody tr {
+    border-bottom: 1px solid rgba(193, 206, 229, 0.1);
+    transition: background 0.2s ease;
+}
+
+.attendance-sheet-table tbody tr:hover {
+    background: rgba(124, 58, 237, 0.1);
+}
+
+.attendance-sheet-table td {
+    padding: 0.9rem 1rem;
+    color: #F1F5FB;
+}
+
+.attendance-sheet-table td.date-cell {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.attendance-sheet-table td.present {
+    color: #10b981;
+}
+
+.attendance-sheet-table td.absent {
+    color: #ef4444;
+}
+
+.attendance-sheet-table td.percentage-cell {
+    font-weight: 600;
+    color: #7c3aed;
+}
+
+.attendance-sheet-table td.marks-cell {
+    font-weight: 700;
+    color: #f59e0b;
+    font-size: 1.05rem;
+}
+
+.card-icon-marks {
+    color: #f59e0b;
+    font-size: 2rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .qr-content {
@@ -581,6 +754,21 @@ console.log('Auth guard check - Student:', {{ Auth::guard('student')->check() ? 
     
     .attendance-stats {
         width: 100%;
+    }
+    
+    .table-header-actions {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .attendance-sheet-table {
+        font-size: 0.85rem;
+    }
+    
+    .attendance-sheet-table th,
+    .attendance-sheet-table td {
+        padding: 0.6rem 0.5rem;
     }
 }
 </style>
@@ -768,6 +956,103 @@ document.getElementById('closeQRBtn').addEventListener('click', function() {
     }
 });
 </script>
+
+<!-- Manual Attendance Sheet JavaScript -->
+<script>
+// Load attendance sheet data
+function loadAttendanceSheet() {
+    const loader = document.getElementById('attendanceLoader');
+    const wrapper = document.getElementById('attendanceTableWrapper');
+    
+    fetch(`/courses/{{ $course->id }}/attendance/sheet`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayAttendanceSheet(data);
+                loader.style.display = 'none';
+                wrapper.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading attendance sheet:', error);
+            loader.innerHTML = 'Failed to load attendance data';
+        });
+}
+
+function displayAttendanceSheet(data) {
+    const thead = document.getElementById('attendanceTableHead');
+    const tbody = document.getElementById('attendanceTableBody');
+    
+    // Build table header
+    let headerHTML = '<tr><th>Roll</th><th>Name</th>';
+    data.dates.forEach(date => {
+        const dateObj = new Date(date);
+        const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        headerHTML += `<th class="date-column">${formattedDate}</th>`;
+    });
+    headerHTML += '<th>Present</th><th>%</th><th>Marks</th></tr>';
+    thead.innerHTML = headerHTML;
+    
+    // Build table body
+    let bodyHTML = '';
+    data.students.forEach(student => {
+        bodyHTML += `<tr>
+            <td>${student.roll}</td>
+            <td>${student.name}</td>`;
+        
+        data.dates.forEach(date => {
+            const status = student.attendance[date] || 'A';
+            const className = status === 'P' ? 'date-cell present' : 'date-cell absent';
+            bodyHTML += `<td class="${className}">${status}</td>`;
+        });
+        
+        bodyHTML += `
+            <td>${student.present_count}</td>
+            <td class="percentage-cell">${student.percentage}%</td>
+            <td class="marks-cell">${student.marks || '-'}</td>
+        </tr>`;
+    });
+    tbody.innerHTML = bodyHTML;
+}
+
+// Calculate marks button
+document.getElementById('calculateMarksBtn').addEventListener('click', function() {
+    if (!confirm('This will calculate and update attendance marks for all students based on their attendance percentage. Continue?')) {
+        return;
+    }
+    
+    this.disabled = true;
+    this.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Calculating...';
+    
+    fetch(`/courses/{{ $course->id }}/attendance/calculate-marks`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            loadAttendanceSheet(); // Reload the table
+        } else {
+            alert(data.message);
+        }
+        this.disabled = false;
+        this.innerHTML = '<span class="material-symbols-outlined">calculate</span> Calculate Marks';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to calculate marks');
+        this.disabled = false;
+        this.innerHTML = '<span class="material-symbols-outlined">calculate</span> Calculate Marks';
+    });
+});
+
+// Load on page load
+loadAttendanceSheet();
+</script>
 @endif
 
 @if(Auth::guard('student')->check())
@@ -901,7 +1186,7 @@ try {
             .then(data => {
                 if (data.success) {
                     updateCalendar(data.attendances);
-                    updateSummary(data.attendances);
+                    updateSummary(data);
                 }
             });
     }
@@ -1016,15 +1301,22 @@ try {
     calendar.innerHTML = html;
 }
 
-function updateSummary(attendances) {
-    const present = attendances.filter(a => a.status === 'present').length;
-    const absent = attendances.filter(a => a.status === 'absent').length;
-    const total = present + absent;
-    const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+function updateSummary(data) {
+    // Use day-based counts from API response
+    const presentDays = data.present_days || 0;
+    const totalDays = data.total_days || 0;
+    const absentDays = totalDays - presentDays;
+    const rate = data.percentage || 0;
     
-    document.getElementById('totalPresent').textContent = present;
-    document.getElementById('totalAbsent').textContent = absent;
+    // Get marks from the first attendance record that has marks
+    const attendances = data.attendances || [];
+    const marksRecord = attendances.find(a => a.marks !== null && a.marks !== undefined);
+    const marks = marksRecord ? marksRecord.marks : 0;
+    
+    document.getElementById('totalPresent').textContent = presentDays;
+    document.getElementById('totalAbsent').textContent = absentDays;
     document.getElementById('attendanceRate').textContent = rate + '%';
+    document.getElementById('attendanceMarks').textContent = marks;
     }
 
     // Load data on page load

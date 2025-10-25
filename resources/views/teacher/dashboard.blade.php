@@ -60,11 +60,18 @@
         backdrop-filter: blur(10px);
         min-width: 320px;
         max-width: 320px;
+        cursor: pointer;
     }
 
     .course-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 24px rgba(64, 26, 117, 0.2);
+    }
+
+    .course-card-clickable {
+        text-decoration: none;
+        color: inherit;
+        display: block;
     }
 
     .course-header {
@@ -320,7 +327,7 @@
 
     <div class="courses-grid">
         @forelse(auth()->guard('teacher')->user()->courses as $course)
-            <div class="course-card" style="background: linear-gradient(135deg, 
+            <div class="course-card" onclick="window.location.href='{{ route('courses.show', $course->id) }}'" style="background: linear-gradient(135deg, 
                 @if(str_contains($course->course_code, 'CSE') || str_contains($course->course_code, 'EEE'))
                     rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1)
                 @elseif(str_contains($course->course_code, 'ME') || str_contains($course->course_code, 'IPE'))
@@ -342,7 +349,7 @@
                         <div class="course-title">{{ $course->course_title }}</div>
                     </div>
                     <div class="three-dot-menu">
-                        <button class="three-dot-btn" onclick="toggleDropdown({{ $course->id }})">⋮</button>
+                        <button class="three-dot-btn" onclick="event.stopPropagation(); toggleDropdown({{ $course->id }})">⋮</button>
                         <div id="dropdown-{{ $course->id }}" class="dropdown-menu-custom">
                             <form action="{{ route('courses.destroy', $course->id) }}" method="POST">
                                 @csrf

@@ -50,6 +50,7 @@ Route::middleware(['teacher.auth'])->group(function () {
     // Course management routes for teachers
     Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
     Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('courses.destroy');
+    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
     
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });
@@ -88,6 +89,7 @@ Route::middleware(['student.auth'])->group(function () {
     // Course enrollment routes for students
     Route::post('/courses/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
     Route::delete('/courses/{id}/unenroll', [CourseController::class, 'unenroll'])->name('courses.unenroll');
+    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
     
     Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 });

@@ -121,6 +121,10 @@ Route::middleware(['student.auth'])->group(function () {
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
     Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'delete'])->name('notifications.delete');
     
+    // Google Calendar routes
+    Route::get('/google-calendar/export', [\App\Http\Controllers\GoogleCalendarController::class, 'exportToGoogleCalendar'])->name('google-calendar.export');
+    Route::get('/google-calendar/add/{ctId}', [\App\Http\Controllers\GoogleCalendarController::class, 'addSingleCT'])->name('google-calendar.add');
+    
     Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 });
 

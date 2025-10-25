@@ -465,6 +465,15 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <!-- Add to Google Calendar Button -->
+                                <a href="{{ route('google-calendar.add', $ct->id) }}" 
+                                   target="_blank"
+                                   class="add-to-gcal-btn"
+                                   style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #4285F4, #34A853); color: #fff; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 500; margin-top: 1rem; transition: transform 0.2s, box-shadow 0.2s;">
+                                    <span class="material-symbols-outlined" style="font-size: 1.2rem;">calendar_add_on</span>
+                                    Add to Google Calendar
+                                </a>
                                 @else
                                 <!-- Status badge for Teachers -->
                                 <div class="countdown-timer" id="countdown-{{ $ct->id }}">

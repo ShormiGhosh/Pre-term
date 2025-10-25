@@ -1308,10 +1308,8 @@ function updateSummary(data) {
     const absentDays = totalDays - presentDays;
     const rate = data.percentage || 0;
     
-    // Get marks from the first attendance record that has marks
-    const attendances = data.attendances || [];
-    const marksRecord = attendances.find(a => a.marks !== null && a.marks !== undefined);
-    const marks = marksRecord ? marksRecord.marks : 0;
+    // Get marks directly from API response
+    const marks = data.marks || 0;
     
     document.getElementById('totalPresent').textContent = presentDays;
     document.getElementById('totalAbsent').textContent = absentDays;

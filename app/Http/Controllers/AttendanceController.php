@@ -214,12 +214,22 @@ class AttendanceController extends Controller
             }
         }
 
+        // Get calculated marks if exists
+        $latestAttendance = Attendance::where('student_id', $student->id)
+            ->where('course_id', $courseId)
+            ->whereNotNull('marks')
+            ->orderBy('updated_at', 'desc')
+            ->first();
+        
+        $marks = $latestAttendance ? $latestAttendance->marks : 0;
+
         return response()->json([
             'success' => true,
             'attendances' => $attendanceData,
             'total_days' => $totalDays,
             'present_days' => $presentDays,
             'percentage' => $totalDays > 0 ? round(($presentDays / $totalDays) * 100, 2) : 0,
+            'marks' => $marks,
         ]);
     }
 

@@ -406,7 +406,7 @@
                     <h3 style="color: #F1F5FB; font-size: 1.25rem; margin-bottom: 1rem;">Upcoming CTs</h3>
                     <div class="ct-cards-grid">
                         @foreach($upcomingCTs as $ct)
-                        <div class="ct-card upcoming-ct" data-ct-datetime="{{ $ct->ct_datetime->toIso8601String() }}">
+                        <div class="ct-card upcoming-ct" data-ct-timestamp="{{ $ct->ct_datetime->timestamp * 1000 }}">
                             <div class="ct-card-header">
                                 <div>
                                     <h3 class="ct-name">{{ $ct->ct_name }}</h3>
@@ -594,9 +594,10 @@
     }
 
     .ct-cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 1.5rem;
+        margin-top: 1rem;
     }
 
     .ct-card {
@@ -605,6 +606,14 @@
         border-radius: 12px;
         padding: 1.5rem;
         transition: all 0.3s;
+        flex: 0 1 calc(50% - 0.75rem);
+        min-width: 300px;
+    }
+
+    @media (max-width: 768px) {
+        .ct-card {
+            flex: 1 1 100%;
+        }
     }
 
     .ct-card:hover {
@@ -802,16 +811,29 @@ menuItems.forEach(item => {
 // Countdown Timer for CTs
 function updateCountdowns() {
     const ctCards = document.querySelectorAll('.upcoming-ct');
+    console.log('Found CT cards:', ctCards.length);
     
     ctCards.forEach(card => {
-        const ctDatetimeStr = card.getAttribute('data-ct-datetime');
-        if (!ctDatetimeStr) return;
+        const ctTimestamp = card.getAttribute('data-ct-timestamp');
+        console.log('CT Timestamp (ms):', ctTimestamp);
         
-        const ctDatetime = new Date(ctDatetimeStr);
+        if (!ctTimestamp) {
+            console.log('No timestamp found!');
+            return;
+        }
+        
+        // Timestamp is already in milliseconds
+        // Subtract 6 hours (6 * 60 * 60 * 1000 = 21600000 ms) for countdown calculation
+        const adjustedTimestamp = parseInt(ctTimestamp) - (6 * 60 * 60 * 1000);
+        const ctDatetime = new Date(adjustedTimestamp);
         const now = new Date();
         const diff = ctDatetime - now;
         
+        console.log('Original CT Time:', new Date(parseInt(ctTimestamp)));
+        console.log('Adjusted CT Time (for countdown):', ctDatetime, 'Now:', now, 'Diff (ms):', diff);
+        
         if (diff <= 0) {
+            console.log('CT has passed, reloading...');
             // CT has passed, reload page to update status
             location.reload();
             return;
@@ -822,6 +844,8 @@ function updateCountdowns() {
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        console.log('Time remaining:', days, 'days', hours, 'hours', minutes, 'mins', seconds, 'secs');
         
         // Find countdown element within this card
         const countdown = card.querySelector('.countdown-timer');
@@ -835,15 +859,20 @@ function updateCountdowns() {
             if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
             if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
             if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+        } else {
+            console.log('Countdown element not found!');
         }
     });
 }
 
 // Initialize countdowns
 if (document.querySelectorAll('.upcoming-ct').length > 0) {
+    console.log('Initializing countdown timer...');
     updateCountdowns();
     // Update countdowns every second
     setInterval(updateCountdowns, 1000);
+} else {
+    console.log('No upcoming CTs found');
 }
 </script>
 @endsection

@@ -43,7 +43,7 @@
                                     @endforeach
                                     @foreach($allCTs as $ct)
                                         <th style="padding: 1rem; text-align: center; color: #10b981; font-weight: 600; font-size: 0.85rem;">
-                                            {{ $ct->ct_name }}<br>Avg
+                                            {{ $ct->ct_name }}<br>Highest
                                         </th>
                                     @endforeach
                                 </tr>
@@ -78,12 +78,12 @@
                                         @endforeach
                                         @foreach($allCTs as $ct)
                                             @php
-                                                $avg = \App\Models\CTMark::where('ct_schedule_id', $ct->id)
+                                                $highest = \App\Models\CTMark::where('ct_schedule_id', $ct->id)
                                                                         ->whereNotNull('marks_obtained')
-                                                                        ->avg('marks_obtained');
+                                                                        ->max('marks_obtained');
                                             @endphp
                                             <td style="padding: 1rem; text-align: center; color: #10b981; font-weight: 600;">
-                                                {{ $avg ? number_format($avg, 2) : '-' }}
+                                                {{ $highest ? number_format($highest, 2) : '-' }}
                                             </td>
                                         @endforeach
                                     </tr>
@@ -116,7 +116,7 @@
                                 <th style="padding: 1rem; text-align: left; color: #F1F5FB; font-weight: 600;">CT Name</th>
                                 <th style="padding: 1rem; text-align: center; color: #F1F5FB; font-weight: 600;">Total Marks</th>
                                 <th style="padding: 1rem; text-align: center; color: #F1F5FB; font-weight: 600;">Marks Obtained</th>
-                                <th style="padding: 1rem; text-align: center; color: #10b981; font-weight: 600;">Class Average</th>
+                                <th style="padding: 1rem; text-align: center; color: #10b981; font-weight: 600;">Highest Mark</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,9 +125,9 @@
                                     $mark = \App\Models\CTMark::where('student_id', $user->id)
                                                              ->where('ct_schedule_id', $ct->id)
                                                              ->first();
-                                    $avg = \App\Models\CTMark::where('ct_schedule_id', $ct->id)
+                                    $highest = \App\Models\CTMark::where('ct_schedule_id', $ct->id)
                                                             ->whereNotNull('marks_obtained')
-                                                            ->avg('marks_obtained');
+                                                            ->max('marks_obtained');
                                 @endphp
                                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                                     <td style="padding: 1rem; color: #F1F5FB;">{{ $ct->ct_name }}</td>
@@ -136,7 +136,7 @@
                                         {{ $mark ? $mark->marks_obtained : '-' }}
                                     </td>
                                     <td style="padding: 1rem; text-align: center; color: #10b981; font-weight: 600;">
-                                        {{ $avg ? number_format($avg, 2) : '-' }}
+                                        {{ $highest ? number_format($highest, 2) : '-' }}
                                     </td>
                                 </tr>
                             @endforeach

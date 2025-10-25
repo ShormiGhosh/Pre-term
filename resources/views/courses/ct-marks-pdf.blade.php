@@ -112,12 +112,12 @@
             text-align: left;
         }
         
-        .class-average-row {
+        .highest-mark-row {
             background: #e8f5e9 !important;
             font-weight: 600;
         }
         
-        .class-average-row td {
+        .highest-mark-row td {
             color: #2e7d32;
             border-top: 2px solid #4caf50;
         }
@@ -210,11 +210,11 @@
                     </tr>
                 @endforeach
                 
-                <!-- Class Average Row -->
-                <tr class="class-average-row">
-                    <td colspan="2" style="text-align: right; padding-right: 15px;">Class Average:</td>
+                <!-- Highest Mark Row -->
+                <tr class="highest-mark-row">
+                    <td colspan="2" style="text-align: right; padding-right: 15px;">Highest Mark:</td>
                     @foreach($ctSchedules as $ct)
-                        <td>{{ $classAverages[$ct->id] }}</td>
+                        <td>{{ $highestMarks[$ct->id] }}</td>
                     @endforeach
                     <td>-</td>
                 </tr>

@@ -181,17 +181,17 @@ class CTScheduleController extends Controller
             $marksData[] = $studentMarks;
         }
         
-        // Calculate class averages
-        $classAverages = [];
+        // Calculate highest marks
+        $highestMarks = [];
         foreach ($ctSchedules as $ct) {
-            $marks = CTMark::where('ct_schedule_id', $ct->id)
+            $highest = CTMark::where('ct_schedule_id', $ct->id)
                           ->whereNotNull('marks_obtained')
-                          ->pluck('marks_obtained');
+                          ->max('marks_obtained');
                           
-            $classAverages[$ct->id] = $marks->count() > 0 ? round($marks->avg(), 2) : '-';
+            $highestMarks[$ct->id] = $highest ? number_format($highest, 2) : '-';
         }
 
         // For now, return view (we'll add PDF generation later)
-        return view('courses.ct-marks-pdf', compact('course', 'ctSchedules', 'students', 'marksData', 'classAverages'));
+        return view('courses.ct-marks-pdf', compact('course', 'ctSchedules', 'students', 'marksData', 'highestMarks'));
     }
 }

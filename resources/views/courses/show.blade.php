@@ -54,7 +54,8 @@
     .sidebar-menu-item {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        justify-content: flex-start;
+        gap: 0.75rem;
         padding: 1rem 1.5rem;
         color: #C1CEE5;
         text-decoration: none;
@@ -76,12 +77,18 @@
     }
 
     .sidebar-menu-icon {
-        display: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-right: 0.75rem;
+        vertical-align: middle;
     }
 
     .sidebar-menu-text {
         font-size: 0.9375rem;
         font-weight: 500;
+        vertical-align: middle;
     }
 
     /* Toggle Button */
@@ -249,22 +256,22 @@
             <div class="sidebar-course-title">{{ $course->course_title }}</div>
         </div>
         <nav class="sidebar-menu">
-            <a class="sidebar-menu-item active" data-section="overview">
-                <span class="sidebar-menu-icon">📊</span>
+            <div class="sidebar-menu-item active" data-section="overview">
+                <span class="sidebar-menu-icon material-symbols-outlined">overview</span>
                 <span class="sidebar-menu-text">Overview</span>
-            </a>
-            <a class="sidebar-menu-item" data-section="attendance">
-                <span class="sidebar-menu-icon">📋</span>
+            </div>
+            <div class="sidebar-menu-item" data-section="attendance">
+                <span class="sidebar-menu-icon material-symbols-outlined">monitoring</span>
                 <span class="sidebar-menu-text">Attendance Sheet</span>
-            </a>
-            <a class="sidebar-menu-item" data-section="ct-marks">
-                <span class="sidebar-menu-icon">📝</span>
+            </div>
+            <div class="sidebar-menu-item" data-section="ct-marks">
+                <span class="sidebar-menu-icon material-symbols-outlined">scoreboard</span>
                 <span class="sidebar-menu-text">CT Marks</span>
-            </a>
-            <a class="sidebar-menu-item" data-section="ct-schedule">
-                <span class="sidebar-menu-icon">📅</span>
+            </div>
+            <div class="sidebar-menu-item" data-section="ct-schedule">
+                <span class="sidebar-menu-icon material-symbols-outlined">timer</span>
                 <span class="sidebar-menu-text">CT Schedule</span>
-            </a>
+            </div>
         </nav>
     </aside>
 
@@ -769,30 +776,45 @@
 </style>
 
 <script>
+// Script runs immediately
+console.log('Script is running!');
+
 // Sidebar Toggle
 const sidebar = document.getElementById('sidebar');
 const sidebarToggle = document.getElementById('sidebarToggle');
 const mainContent = document.getElementById('mainContent');
 
-sidebarToggle.addEventListener('click', function() {
-    sidebar.classList.toggle('closed');
-    sidebarToggle.classList.toggle('closed');
-    mainContent.classList.toggle('expanded');
-    
-    // Change arrow direction
-    if (sidebar.classList.contains('closed')) {
-        sidebarToggle.textContent = '›';
-    } else {
-        sidebarToggle.textContent = '‹';
-    }
-});
+console.log('Sidebar:', sidebar);
+console.log('SidebarToggle:', sidebarToggle);
+console.log('MainContent:', mainContent);
+
+if (sidebar && sidebarToggle && mainContent) {
+    sidebarToggle.addEventListener('click', function() {
+        console.log('Sidebar toggle clicked!');
+        sidebar.classList.toggle('closed');
+        sidebarToggle.classList.toggle('closed');
+        mainContent.classList.toggle('expanded');
+        
+        // Change arrow direction
+        if (sidebar.classList.contains('closed')) {
+            sidebarToggle.textContent = '›';
+        } else {
+            sidebarToggle.textContent = '‹';
+        }
+    });
+}
 
 // Section Navigation
 const menuItems = document.querySelectorAll('.sidebar-menu-item');
 const sections = document.querySelectorAll('.placeholder-content');
 
+console.log('Menu items found:', menuItems.length);
+console.log('Sections found:', sections.length);
+
 menuItems.forEach(item => {
     item.addEventListener('click', function() {
+        console.log('Clicked on:', this.getAttribute('data-section'));
+        
         // Remove active class from all items
         menuItems.forEach(mi => mi.classList.remove('active'));
         
@@ -804,75 +826,81 @@ menuItems.forEach(item => {
         
         // Show selected section
         const sectionId = 'section-' + this.getAttribute('data-section');
-        document.getElementById(sectionId).classList.add('active');
+        const targetSection = document.getElementById(sectionId);
+        
+        console.log('Looking for section:', sectionId);
+        
+        if (targetSection) {
+            targetSection.classList.add('active');
+            console.log('Section activated:', sectionId);
+        } else {
+            console.error('Section not found:', sectionId);
+        }
     });
 });
 
-// Countdown Timer for CTs
-function updateCountdowns() {
-    const ctCards = document.querySelectorAll('.upcoming-ct');
-    console.log('Found CT cards:', ctCards.length);
-    
-    ctCards.forEach(card => {
-        const ctTimestamp = card.getAttribute('data-ct-timestamp');
-        console.log('CT Timestamp (ms):', ctTimestamp);
+    // Countdown Timer for CTs
+    function updateCountdowns() {
+        const ctCards = document.querySelectorAll('.upcoming-ct');
         
-        if (!ctTimestamp) {
-            console.log('No timestamp found!');
-            return;
-        }
-        
-        // Timestamp is already in milliseconds
-        // Subtract 6 hours (6 * 60 * 60 * 1000 = 21600000 ms) for countdown calculation
-        const adjustedTimestamp = parseInt(ctTimestamp) - (6 * 60 * 60 * 1000);
-        const ctDatetime = new Date(adjustedTimestamp);
-        const now = new Date();
-        const diff = ctDatetime - now;
-        
-        console.log('Original CT Time:', new Date(parseInt(ctTimestamp)));
-        console.log('Adjusted CT Time (for countdown):', ctDatetime, 'Now:', now, 'Diff (ms):', diff);
-        
-        if (diff <= 0) {
-            console.log('CT has passed, reloading...');
-            // CT has passed, reload page to update status
-            location.reload();
-            return;
-        }
-        
-        // Calculate time units
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        
-        console.log('Time remaining:', days, 'days', hours, 'hours', minutes, 'mins', seconds, 'secs');
-        
-        // Find countdown element within this card
-        const countdown = card.querySelector('.countdown-timer');
-        if (countdown) {
-            const daysEl = countdown.querySelector('.days');
-            const hoursEl = countdown.querySelector('.hours');
-            const minutesEl = countdown.querySelector('.minutes');
-            const secondsEl = countdown.querySelector('.seconds');
+        ctCards.forEach(card => {
+            const ctTimestamp = card.getAttribute('data-ct-timestamp');
             
-            if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-            if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-            if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-            if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
-        } else {
-            console.log('Countdown element not found!');
-        }
-    });
-}
+            if (!ctTimestamp) {
+                return;
+            }
+            
+            // Timestamp is already in milliseconds
+            // Subtract 6 hours (6 * 60 * 60 * 1000 = 21600000 ms) for countdown calculation
+            const adjustedTimestamp = parseInt(ctTimestamp) - (6 * 60 * 60 * 1000);
+            const ctDatetime = new Date(adjustedTimestamp);
+            const now = new Date();
+            const diff = ctDatetime - now;
+            
+            if (diff <= 0) {
+                // Countdown finished, hide timer and show message
+                const countdown = card.querySelector('.countdown-timer');
+                if (countdown) {
+                    countdown.innerHTML = '<div style="text-align: center; padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;"><span style="color: #fca5a5; font-weight: 600;">⏰ CT Time Reached!</span></div>';
+                }
+                
+                // Check every 30 seconds if we should reload (when actual time passes)
+                const actualTimestamp = parseInt(ctTimestamp);
+                const actualDiff = actualTimestamp - now.getTime();
+                if (actualDiff <= 0) {
+                    // Actual time has passed, reload to move to Past CTs
+                    location.reload();
+                }
+                return;
+            }
+            
+            // Calculate time units
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            // Find countdown element within this card
+            const countdown = card.querySelector('.countdown-timer');
+            if (countdown) {
+                const daysEl = countdown.querySelector('.days');
+                const hoursEl = countdown.querySelector('.hours');
+                const minutesEl = countdown.querySelector('.minutes');
+                const secondsEl = countdown.querySelector('.seconds');
+                
+                if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+                if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+                if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+                if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+            }
+        });
+    }
 
-// Initialize countdowns
-if (document.querySelectorAll('.upcoming-ct').length > 0) {
-    console.log('Initializing countdown timer...');
-    updateCountdowns();
-    // Update countdowns every second
-    setInterval(updateCountdowns, 1000);
-} else {
-    console.log('No upcoming CTs found');
-}
+    // Initialize countdowns
+    if (document.querySelectorAll('.upcoming-ct').length > 0) {
+        updateCountdowns();
+        // Update countdowns every second
+        setInterval(updateCountdowns, 1000);
+    }
 </script>
 @endsection

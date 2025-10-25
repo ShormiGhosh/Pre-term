@@ -50,9 +50,8 @@
             font-weight: 500;
             color: #F1F5FB;
             padding: 0.5rem 1rem;
-            background: rgba(64, 26, 117, 0.3);
-            border-radius: 8px;
-            border: 1px solid rgba(64, 26, 117, 0.5);
+            background: transparent;
+            border: none;
         }
 
         .navbar-right {
@@ -67,30 +66,48 @@
         }
 
         .navbar-links a, .navbar-links button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             color: #C1CEE5;
             text-decoration: none;
             padding: 0.625rem 1.25rem;
-            border-radius: 8px;
-            transition: all 0.3s;
+            transition: color 0.3s;
             font-size: 0.95rem;
             font-weight: 500;
             background: transparent;
-            border: 1px solid transparent;
+            border: none;
             cursor: pointer;
             font-family: inherit;
+            position: relative;
+        }
+
+        .navbar-links a::after, .navbar-links button::after {
+            content: '';
+            position: absolute;
+            bottom: 0.3rem;
+            left: 1.25rem;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #401a75, #5e2a9e);
+            transition: width 0.3s ease-out;
         }
 
         .navbar-links a:hover, .navbar-links button:hover {
-            background: rgba(64, 26, 117, 0.4);
-            border-color: rgba(64, 26, 117, 0.6);
             color: #F1F5FB;
-            transform: translateY(-1px);
+        }
+
+        .navbar-links a:hover::after, .navbar-links button:hover::after {
+            width: calc(100% - 2.5rem);
         }
 
         .navbar-links a.active {
-            background: rgba(64, 26, 117, 0.5);
-            border-color: rgba(64, 26, 117, 0.7);
             color: #F1F5FB;
+        }
+
+        .navbar-links a.active::after {
+            width: calc(100% - 2.5rem);
+            background: linear-gradient(90deg, #5e2a9e, #401a75);
         }
 
         .btn-logout {
@@ -260,19 +277,41 @@
 
             <div class="navbar-right">
                 <div class="navbar-links">
+                    <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'active' : '' }}">
+                        <span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.25rem;">home</span>
+                        Home
+                    </a>
                     @if(session('user_type') === 'teacher')
-                        <a href="{{ route('teacher.dashboard') }}" class="{{ request()->routeIs('teacher.dashboard') ? 'active' : '' }}">Dashboard</a>
-                        <a href="{{ route('teacher.profile') }}" class="{{ request()->routeIs('teacher.profile*') ? 'active' : '' }}">Profile</a>
+                        <a href="{{ route('teacher.dashboard') }}" class="{{ request()->routeIs('teacher.dashboard') ? 'active' : '' }}">
+                            <span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.25rem;">book</span>
+                            Dashboard
+                        </a>
+                        <a href="{{ route('teacher.profile') }}" class="{{ request()->routeIs('teacher.profile*') ? 'active' : '' }}">
+                            <span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.25rem;">person</span>
+                            Profile
+                        </a>
                         <form action="{{ route('teacher.logout') }}" method="POST" style="display: inline; margin: 0;">
                             @csrf
-                            <button type="submit" class="btn-logout">Logout</button>
+                            <button type="submit" class="btn-logout">
+                                <span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.25rem;">logout</span>
+                                Logout
+                            </button>
                         </form>
                     @else
-                        <a href="{{ route('student.dashboard') }}" class="{{ request()->routeIs('student.dashboard') ? 'active' : '' }}">Dashboard</a>
-                        <a href="{{ route('student.profile') }}" class="{{ request()->routeIs('student.profile*') ? 'active' : '' }}">Profile</a>
+                        <a href="{{ route('student.dashboard') }}" class="{{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
+                            <span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.25rem;">book</span>
+                            Dashboard
+                        </a>
+                        <a href="{{ route('student.profile') }}" class="{{ request()->routeIs('student.profile*') ? 'active' : '' }}">
+                            <span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.25rem;">person</span>
+                            Profile
+                        </a>
                         <form action="{{ route('student.logout') }}" method="POST" style="display: inline; margin: 0;">
                             @csrf
-                            <button type="submit" class="btn-logout">Logout</button>
+                            <button type="submit" class="btn-logout">
+                                <span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.25rem;">logout</span>
+                                Logout
+                            </button>
                         </form>
                     @endif
                 </div>

@@ -61,6 +61,12 @@ Route::middleware(['teacher.auth'])->group(function () {
     Route::post('/courses/{courseId}/ct-marks/save', [\App\Http\Controllers\CTScheduleController::class, 'saveMarks'])->name('ct-marks.save');
     Route::get('/courses/{courseId}/ct-marks/download', [\App\Http\Controllers\CTScheduleController::class, 'downloadMarks'])->name('ct-marks.download');
     
+    // Attendance routes for teachers
+    Route::post('/courses/{courseId}/attendance/generate-qr', [\App\Http\Controllers\AttendanceController::class, 'generateQR'])->name('attendance.generate-qr');
+    Route::get('/attendance/session/{sessionId}/status', [\App\Http\Controllers\AttendanceController::class, 'getSessionStatus'])->name('attendance.session.status');
+    Route::post('/attendance/session/{sessionId}/close', [\App\Http\Controllers\AttendanceController::class, 'closeSession'])->name('attendance.session.close');
+    Route::get('/courses/{courseId}/attendance/active', [\App\Http\Controllers\AttendanceController::class, 'getActiveSession'])->name('teacher.attendance.active');
+    
     Route::post('/teacher/logout', [TeacherAuthController::class, 'logout'])->name('teacher.logout');
 });
 
@@ -99,6 +105,11 @@ Route::middleware(['student.auth'])->group(function () {
     Route::post('/courses/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
     Route::delete('/courses/{id}/unenroll', [CourseController::class, 'unenroll'])->name('courses.unenroll');
     Route::get('/student/courses/{id}', [CourseController::class, 'show'])->name('student.courses.show');
+    
+    // Attendance routes for students
+    Route::post('/attendance/mark', [\App\Http\Controllers\AttendanceController::class, 'markAttendance'])->name('attendance.mark');
+    Route::get('/courses/{courseId}/attendance/active', [\App\Http\Controllers\AttendanceController::class, 'getActiveSession'])->name('attendance.active');
+    Route::get('/courses/{courseId}/attendance/data', [\App\Http\Controllers\AttendanceController::class, 'getStudentAttendance'])->name('attendance.student.data');
     
     // AJAX: Mark CT as past (auto-update when countdown expires)
     Route::post('/ct-schedules/{id}/mark-past', [\App\Http\Controllers\CTScheduleController::class, 'markAsPast'])->name('ct-schedules.mark-past');

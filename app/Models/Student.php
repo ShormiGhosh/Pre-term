@@ -67,4 +67,20 @@ class Student extends Authenticatable
     {
         return $this->hasMany(CourseEnrollment::class);
     }
+
+    /**
+     * Get all attendances for this student
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    /**
+     * Get attendance for a specific course
+     */
+    public function attendancesForCourse($courseId)
+    {
+        return $this->attendances()->where('course_id', $courseId);
+    }
 }

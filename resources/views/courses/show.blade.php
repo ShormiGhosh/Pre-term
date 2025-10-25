@@ -342,10 +342,7 @@
             </div>
 
             <div class="content-section">
-                <div class="empty-state">
-                    <div class="empty-state-icon"></div>
-                    <p class="empty-state-text">Attendance tracking will be available here</p>
-                </div>
+                @include('courses.attendance-section')
             </div>
         </div>
 

@@ -52,6 +52,11 @@ class CourseController extends Controller
             if (!$isEnrolled) {
                 return redirect()->back()->with('error', 'You are not enrolled in this course.');
             }
+            
+            // Store last visited course in cookie (for students only)
+            return response()
+                ->view('courses.show', compact('course', 'user'))
+                ->cookie('last_visited_course', $course->id, 60 * 24 * 7); // 7 days
         }
         
         return view('courses.show', compact('course', 'user'));

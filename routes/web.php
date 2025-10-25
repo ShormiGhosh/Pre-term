@@ -114,6 +114,13 @@ Route::middleware(['student.auth'])->group(function () {
     // AJAX: Mark CT as past (auto-update when countdown expires)
     Route::post('/ct-schedules/{id}/mark-past', [\App\Http\Controllers\CTScheduleController::class, 'markAsPast'])->name('ct-schedules.mark-past');
     
+    // Notification routes
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread-count', [\App\Http\Controllers\NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+    Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'delete'])->name('notifications.delete');
+    
     Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 });
 

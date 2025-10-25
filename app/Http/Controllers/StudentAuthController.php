@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\Course;
 use App\Models\VerificationCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -146,9 +147,21 @@ class StudentAuthController extends Controller
     /**
      * Show student dashboard
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        return view('student.dashboard');
+        // Get last visited course from cookie
+        $lastCourseId = $request->cookie('last_visited_course');
+        $lastCourse = null;
+        
+        if ($lastCourseId) {
+            $student = Auth::guard('student')->user();
+            // Only show if student is still enrolled
+            $lastCourse = Course::whereHas('students', function($query) use ($student) {
+                $query->where('student_id', $student->id);
+            })->find($lastCourseId);
+        }
+        
+        return view('student.dashboard', compact('lastCourse'));
     }
 
     /**

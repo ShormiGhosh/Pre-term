@@ -77,6 +77,22 @@ class Student extends Authenticatable
     }
 
     /**
+     * Get all notifications for this student
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get unread notifications count
+     */
+    public function unreadNotificationsCount()
+    {
+        return $this->notifications()->unread()->count();
+    }
+
+    /**
      * Get attendance for a specific course
      */
     public function attendancesForCourse($courseId)

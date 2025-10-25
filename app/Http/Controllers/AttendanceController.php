@@ -391,9 +391,8 @@ class AttendanceController extends Controller
         // Get all enrolled students
         $students = $course->students()->orderBy('roll_number')->get();
 
-        // Get all closed attendance sessions with dates (group by date)
+        // Get all attendance sessions with dates (including active sessions)
         $sessions = AttendanceSession::where('course_id', $courseId)
-            ->where('is_active', false)
             ->orderBy('started_at')
             ->get()
             ->groupBy(function($session) {
@@ -479,9 +478,8 @@ class AttendanceController extends Controller
         $totalMarks = $course->attendance_total_marks ?? 10;
         $students = $course->students;
 
-        // Get total closed sessions
+        // Get total sessions (all sessions, including active ones)
         $totalSessions = AttendanceSession::where('course_id', $courseId)
-            ->where('is_active', false)
             ->get()
             ->groupBy(function($session) {
                 return $session->started_at->format('Y-m-d');
@@ -496,9 +494,8 @@ class AttendanceController extends Controller
         }
 
         foreach ($students as $student) {
-            // Count unique dates present
+            // Count unique dates present (all sessions)
             $sessionIds = AttendanceSession::where('course_id', $courseId)
-                ->where('is_active', false)
                 ->pluck('id');
 
             $presentCount = Attendance::whereIn('attendance_session_id', $sessionIds)
@@ -529,10 +526,27 @@ class AttendanceController extends Controller
                 $marks = 0;
             }
 
+            // Log for debugging
+            \Log::info("Calculating marks for student {$student->id} ({$student->roll_number}): Present={$presentCount}, Total={$totalSessions}, Percentage={$percentage}%, Marks={$marks}");
+
             // Update marks in all attendance records for this student in this course
-            Attendance::where('student_id', $student->id)
+            $updated = Attendance::where('student_id', $student->id)
                 ->where('course_id', $courseId)
                 ->update(['marks' => $marks]);
+            
+            \Log::info("Updated {$updated} attendance records for student {$student->roll_number}");
+
+            // Send notification if attendance is below 60%
+            if ($percentage < 60) {
+                \App\Models\Notification::create([
+                    'student_id' => $student->id,
+                    'type' => 'low_attendance',
+                    'title' => 'Low Attendance Alert',
+                    'message' => "Your attendance in {$course->course_code} - {$course->course_title} is " . number_format($percentage, 1) . "%. Please improve your attendance to avoid penalties.",
+                    'icon' => null,
+                    'link' => route('student.courses.show', $courseId)
+                ]);
+            }
         }
 
         return response()->json([

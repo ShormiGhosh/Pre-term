@@ -100,6 +100,8 @@ class CTScheduleController extends Controller
             'marks.*.marks_obtained' => 'nullable|numeric|min:0',
         ]);
 
+        $studentsNotified = [];
+
         foreach ($validated['marks'] as $markData) {
             // Get total marks for validation
             $ctSchedule = CTSchedule::find($markData['ct_schedule_id']);
@@ -111,7 +113,7 @@ class CTScheduleController extends Controller
             }
 
             // Update or create mark
-            CTMark::updateOrCreate(
+            $mark = CTMark::updateOrCreate(
                 [
                     'ct_schedule_id' => $markData['ct_schedule_id'],
                     'student_id' => $markData['student_id'],
@@ -121,6 +123,20 @@ class CTScheduleController extends Controller
                     'marks_obtained' => $markData['marks_obtained'] ?? null
                 ]
             );
+
+            // Create notification for student if marks were actually saved (not null)
+            if (isset($markData['marks_obtained']) && !in_array($markData['student_id'], $studentsNotified)) {
+                \App\Models\Notification::create([
+                    'student_id' => $markData['student_id'],
+                    'type' => 'ct_marks_added',
+                    'title' => 'CT Marks Added',
+                    'message' => "Your marks for {$ctSchedule->ct_name} in {$course->course_code} have been uploaded by your teacher.",
+                    'icon' => null,
+                    'link' => route('student.courses.show', $courseId)
+                ]);
+                
+                $studentsNotified[] = $markData['student_id'];
+            }
         }
 
         return redirect()->back()->with('success', 'CT marks saved successfully!');
